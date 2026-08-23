@@ -26,3 +26,17 @@ void op_ld_hl_u16(struct State* state)
 	printf("LD HL, $%04x\n", value);
 }
 
+void op_ld_c_u8(struct State* state)
+{
+	printf("LD C, $%02x\n", state->memory[++state->program_counter]);
+}
+
+void op_ld_a_u8(struct State* state)
+{
+	printf("LD A, $%02x\n", state->memory[++state->program_counter]);
+}
+
+void op_ld_ff00_plus_c_a(struct State* state) 
+{
+	printf("LD (FF00+C), A\n"); 
+}

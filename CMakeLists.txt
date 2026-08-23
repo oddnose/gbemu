@@ -10,6 +10,7 @@ set(SOURCE_FILES
 	src/op/alu_instructions.c
 	src/op/cb_lookup.c
 	src/op/rotate_instructions.c
+	src/op/branch_instructions.c
 	src/main.c
 )
 

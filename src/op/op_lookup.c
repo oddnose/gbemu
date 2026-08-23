@@ -6,6 +6,7 @@
 #include "load_instructions.h"
 #include "alu_instructions.h"
 #include "op/cb_lookup.h"
+#include "branch_instructions.h"
 
 void op_not_implemented(struct State* state)
 {
@@ -29,7 +30,7 @@ void(*op_lookup[256])(struct State*) = {
 	[0x0b] = op_not_implemented,
 	[0x0c] = op_not_implemented,
 	[0x0d] = op_not_implemented,
-	[0x0e] = op_not_implemented,
+	[0x0e] = op_ld_c_u8,
 	[0x0f] = op_not_implemented,
 	[0x10] = op_not_implemented,
 	[0x11] = op_not_implemented,
@@ -47,7 +48,7 @@ void(*op_lookup[256])(struct State*) = {
 	[0x1d] = op_not_implemented,
 	[0x1e] = op_not_implemented,
 	[0x1f] = op_not_implemented,
-	[0x20] = op_not_implemented,
+	[0x20] = op_jr_nz_i8,
 	[0x21] = op_ld_hl_u16,
 	[0x22] = op_not_implemented,
 	[0x23] = op_not_implemented,
@@ -77,7 +78,7 @@ void(*op_lookup[256])(struct State*) = {
 	[0x3b] = op_not_implemented,
 	[0x3c] = op_not_implemented,
 	[0x3d] = op_not_implemented,
-	[0x3e] = op_not_implemented,
+	[0x3e] = op_ld_a_u8,
 	[0x3f] = op_not_implemented,
 	[0x40] = op_not_implemented,
 	[0x41] = op_not_implemented,
@@ -241,7 +242,7 @@ void(*op_lookup[256])(struct State*) = {
 	[0xdf] = op_not_implemented,
 	[0xe0] = op_not_implemented,
 	[0xe1] = op_not_implemented,
-	[0xe2] = op_not_implemented,
+	[0xe2] = op_ld_ff00_plus_c_a,
 	[0xe3] = op_not_implemented,
 	[0xe4] = op_not_implemented,
 	[0xe5] = op_not_implemented,
