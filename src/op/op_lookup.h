@@ -1,8 +1,6 @@
-#ifndef OP_LOOKUP_H
-#define OP_LOOKUP_H
+#pragma once
 
-#include "state.h"
+#include "op_definition.h"
+#include <stdint.h>
 
-void run_op(struct State* state);
-
-#endif
+struct OpDefinition decode(struct State* state, uint8_t pos);

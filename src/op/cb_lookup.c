@@ -1,6 +1,7 @@
 #include "cb_lookup.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "op/op_definition.h"
 #include "rotate_instructions.h"
 
 void cb_not_implemented(struct State* state)
@@ -10,267 +11,1034 @@ void cb_not_implemented(struct State* state)
 }
 
 // Initialize lookup table with function pointers
-void(*cb_lookup[256])(struct State*) = {
-	[0x00] = cb_not_implemented,
-	[0x01] = cb_not_implemented,
-	[0x02] = cb_not_implemented,
-	[0x03] = cb_not_implemented,
-	[0x04] = cb_not_implemented,
-	[0x05] = cb_not_implemented,
-	[0x06] = cb_not_implemented,
-	[0x07] = cb_not_implemented,
-	[0x08] = cb_not_implemented,
-	[0x09] = cb_not_implemented,
-	[0x0a] = cb_not_implemented,
-	[0x0b] = cb_not_implemented,
-	[0x0c] = cb_not_implemented,
-	[0x0d] = cb_not_implemented,
-	[0x0e] = cb_not_implemented,
-	[0x0f] = cb_not_implemented,
-	[0x10] = cb_not_implemented,
-	[0x11] = cb_not_implemented,
-	[0x12] = cb_not_implemented,
-	[0x13] = cb_not_implemented,
-	[0x14] = cb_not_implemented,
-	[0x15] = cb_not_implemented,
-	[0x16] = cb_not_implemented,
-	[0x17] = cb_not_implemented,
-	[0x18] = cb_not_implemented,
-	[0x19] = cb_not_implemented,
-	[0x1a] = cb_not_implemented,
-	[0x1b] = cb_not_implemented,
-	[0x1c] = cb_not_implemented,
-	[0x1d] = cb_not_implemented,
-	[0x1e] = cb_not_implemented,
-	[0x1f] = cb_not_implemented,
-	[0x20] = cb_not_implemented,
-	[0x21] = cb_not_implemented,
-	[0x22] = cb_not_implemented,
-	[0x23] = cb_not_implemented,
-	[0x24] = cb_not_implemented,
-	[0x25] = cb_not_implemented,
-	[0x26] = cb_not_implemented,
-	[0x27] = cb_not_implemented,
-	[0x28] = cb_not_implemented,
-	[0x29] = cb_not_implemented,
-	[0x2a] = cb_not_implemented,
-	[0x2b] = cb_not_implemented,
-	[0x2c] = cb_not_implemented,
-	[0x2d] = cb_not_implemented,
-	[0x2e] = cb_not_implemented,
-	[0x2f] = cb_not_implemented,
-	[0x30] = cb_not_implemented,
-	[0x31] = cb_not_implemented,
-	[0x32] = cb_not_implemented,
-	[0x33] = cb_not_implemented,
-	[0x34] = cb_not_implemented,
-	[0x35] = cb_not_implemented,
-	[0x36] = cb_not_implemented,
-	[0x37] = cb_not_implemented,
-	[0x38] = cb_not_implemented,
-	[0x39] = cb_not_implemented,
-	[0x3a] = cb_not_implemented,
-	[0x3b] = cb_not_implemented,
-	[0x3c] = cb_not_implemented,
-	[0x3d] = cb_not_implemented,
-	[0x3e] = cb_not_implemented,
-	[0x3f] = cb_not_implemented,
-	[0x40] = cb_not_implemented,
-	[0x41] = cb_not_implemented,
-	[0x42] = cb_not_implemented,
-	[0x43] = cb_not_implemented,
-	[0x44] = cb_not_implemented,
-	[0x45] = cb_not_implemented,
-	[0x46] = cb_not_implemented,
-	[0x47] = cb_not_implemented,
-	[0x48] = cb_not_implemented,
-	[0x49] = cb_not_implemented,
-	[0x4a] = cb_not_implemented,
-	[0x4b] = cb_not_implemented,
-	[0x4c] = cb_not_implemented,
-	[0x4d] = cb_not_implemented,
-	[0x4e] = cb_not_implemented,
-	[0x4f] = cb_not_implemented,
-	[0x50] = cb_not_implemented,
-	[0x51] = cb_not_implemented,
-	[0x52] = cb_not_implemented,
-	[0x53] = cb_not_implemented,
-	[0x54] = cb_not_implemented,
-	[0x55] = cb_not_implemented,
-	[0x56] = cb_not_implemented,
-	[0x57] = cb_not_implemented,
-	[0x58] = cb_not_implemented,
-	[0x59] = cb_not_implemented,
-	[0x5a] = cb_not_implemented,
-	[0x5b] = cb_not_implemented,
-	[0x5c] = cb_not_implemented,
-	[0x5d] = cb_not_implemented,
-	[0x5e] = cb_not_implemented,
-	[0x5f] = cb_not_implemented,
-	[0x60] = cb_not_implemented,
-	[0x61] = cb_not_implemented,
-	[0x62] = cb_not_implemented,
-	[0x63] = cb_not_implemented,
-	[0x64] = cb_not_implemented,
-	[0x65] = cb_not_implemented,
-	[0x66] = cb_not_implemented,
-	[0x67] = cb_not_implemented,
-	[0x68] = cb_not_implemented,
-	[0x69] = cb_not_implemented,
-	[0x6a] = cb_not_implemented,
-	[0x6b] = cb_not_implemented,
-	[0x6c] = cb_not_implemented,
-	[0x6d] = cb_not_implemented,
-	[0x6e] = cb_not_implemented,
-	[0x6f] = cb_not_implemented,
-	[0x70] = cb_not_implemented,
-	[0x71] = cb_not_implemented,
-	[0x72] = cb_not_implemented,
-	[0x73] = cb_not_implemented,
-	[0x74] = cb_not_implemented,
-	[0x75] = cb_not_implemented,
-	[0x76] = cb_not_implemented,
-	[0x77] = cb_not_implemented,
-	[0x78] = cb_not_implemented,
-	[0x79] = cb_not_implemented,
-	[0x7a] = cb_not_implemented,
-	[0x7b] = cb_not_implemented,
-	[0x7c] = op_bit_7_h,
-	[0x7d] = cb_not_implemented,
-	[0x7e] = cb_not_implemented,
-	[0x7f] = cb_not_implemented,
-	[0x80] = cb_not_implemented,
-	[0x81] = cb_not_implemented,
-	[0x82] = cb_not_implemented,
-	[0x83] = cb_not_implemented,
-	[0x84] = cb_not_implemented,
-	[0x85] = cb_not_implemented,
-	[0x86] = cb_not_implemented,
-	[0x87] = cb_not_implemented,
-	[0x88] = cb_not_implemented,
-	[0x89] = cb_not_implemented,
-	[0x8a] = cb_not_implemented,
-	[0x8b] = cb_not_implemented,
-	[0x8c] = cb_not_implemented,
-	[0x8d] = cb_not_implemented,
-	[0x8e] = cb_not_implemented,
-	[0x8f] = cb_not_implemented,
-	[0x90] = cb_not_implemented,
-	[0x91] = cb_not_implemented,
-	[0x92] = cb_not_implemented,
-	[0x93] = cb_not_implemented,
-	[0x94] = cb_not_implemented,
-	[0x95] = cb_not_implemented,
-	[0x96] = cb_not_implemented,
-	[0x97] = cb_not_implemented,
-	[0x98] = cb_not_implemented,
-	[0x99] = cb_not_implemented,
-	[0x9a] = cb_not_implemented,
-	[0x9b] = cb_not_implemented,
-	[0x9c] = cb_not_implemented,
-	[0x9d] = cb_not_implemented,
-	[0x9e] = cb_not_implemented,
-	[0x9f] = cb_not_implemented,
-	[0xa0] = cb_not_implemented,
-	[0xa1] = cb_not_implemented,
-	[0xa2] = cb_not_implemented,
-	[0xa3] = cb_not_implemented,
-	[0xa4] = cb_not_implemented,
-	[0xa5] = cb_not_implemented,
-	[0xa6] = cb_not_implemented,
-	[0xa7] = cb_not_implemented,
-	[0xa8] = cb_not_implemented,
-	[0xa9] = cb_not_implemented,
-	[0xaa] = cb_not_implemented,
-	[0xab] = cb_not_implemented,
-	[0xac] = cb_not_implemented,
-	[0xad] = cb_not_implemented,
-	[0xae] = cb_not_implemented,
-	[0xaf] = cb_not_implemented,
-	[0xb0] = cb_not_implemented,
-	[0xb1] = cb_not_implemented,
-	[0xb2] = cb_not_implemented,
-	[0xb3] = cb_not_implemented,
-	[0xb4] = cb_not_implemented,
-	[0xb5] = cb_not_implemented,
-	[0xb6] = cb_not_implemented,
-	[0xb7] = cb_not_implemented,
-	[0xb8] = cb_not_implemented,
-	[0xb9] = cb_not_implemented,
-	[0xba] = cb_not_implemented,
-	[0xbb] = cb_not_implemented,
-	[0xbc] = cb_not_implemented,
-	[0xbd] = cb_not_implemented,
-	[0xbe] = cb_not_implemented,
-	[0xbf] = cb_not_implemented,
-	[0xc0] = cb_not_implemented,
-	[0xc1] = cb_not_implemented,
-	[0xc2] = cb_not_implemented,
-	[0xc3] = cb_not_implemented,
-	[0xc4] = cb_not_implemented,
-	[0xc5] = cb_not_implemented,
-	[0xc6] = cb_not_implemented,
-	[0xc7] = cb_not_implemented,
-	[0xc8] = cb_not_implemented,
-	[0xc9] = cb_not_implemented,
-	[0xca] = cb_not_implemented,
-	[0xcb] = cb_not_implemented,
-	[0xcc] = cb_not_implemented,
-	[0xcd] = cb_not_implemented,
-	[0xce] = cb_not_implemented,
-	[0xcf] = cb_not_implemented,
-	[0xd0] = cb_not_implemented,
-	[0xd1] = cb_not_implemented,
-	[0xd2] = cb_not_implemented,
-	[0xd3] = cb_not_implemented,
-	[0xd4] = cb_not_implemented,
-	[0xd5] = cb_not_implemented,
-	[0xd6] = cb_not_implemented,
-	[0xd7] = cb_not_implemented,
-	[0xd8] = cb_not_implemented,
-	[0xd9] = cb_not_implemented,
-	[0xda] = cb_not_implemented,
-	[0xdb] = cb_not_implemented,
-	[0xdc] = cb_not_implemented,
-	[0xdd] = cb_not_implemented,
-	[0xde] = cb_not_implemented,
-	[0xdf] = cb_not_implemented,
-	[0xe0] = cb_not_implemented,
-	[0xe1] = cb_not_implemented,
-	[0xe2] = cb_not_implemented,
-	[0xe3] = cb_not_implemented,
-	[0xe4] = cb_not_implemented,
-	[0xe5] = cb_not_implemented,
-	[0xe6] = cb_not_implemented,
-	[0xe7] = cb_not_implemented,
-	[0xe8] = cb_not_implemented,
-	[0xe9] = cb_not_implemented,
-	[0xea] = cb_not_implemented,
-	[0xeb] = cb_not_implemented,
-	[0xec] = cb_not_implemented,
-	[0xed] = cb_not_implemented,
-	[0xee] = cb_not_implemented,
-	[0xef] = cb_not_implemented,
-	[0xf0] = cb_not_implemented,
-	[0xf1] = cb_not_implemented,
-	[0xf2] = cb_not_implemented,
-	[0xf3] = cb_not_implemented,
-	[0xf4] = cb_not_implemented,
-	[0xf5] = cb_not_implemented,
-	[0xf6] = cb_not_implemented,
-	[0xf7] = cb_not_implemented,
-	[0xf8] = cb_not_implemented,
-	[0xf9] = cb_not_implemented,
-	[0xfa] = cb_not_implemented,
-	[0xfb] = cb_not_implemented,
-	[0xfc] = cb_not_implemented,
-	[0xfd] = cb_not_implemented,
-	[0xfe] = cb_not_implemented,
-	[0xff] = cb_not_implemented,
+struct OpDefinition cb_lookup[256] = {
+	[0x00] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x01] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x02] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x03] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x04] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x05] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x06] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x07] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x08] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x09] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x0a] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x0b] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x0c] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x0d] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x0e] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x0f] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x10] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x11] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x12] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x13] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x14] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x15] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x16] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x17] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x18] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x19] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x1a] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x1b] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x1c] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x1d] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x1e] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x1f] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x20] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x21] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x22] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x23] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x24] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x25] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x26] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x27] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x28] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x29] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x2a] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x2b] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x2c] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x2d] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x2e] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x2f] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x30] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x31] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x32] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x33] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x34] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x35] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x36] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x37] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x38] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x39] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x3a] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x3b] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x3c] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x3d] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x3e] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x3f] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x40] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x41] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x42] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x43] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x44] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x45] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x46] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x47] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x48] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x49] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x4a] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x4b] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x4c] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x4d] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x4e] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x4f] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x50] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x51] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x52] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x53] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x54] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x55] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x56] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x57] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x58] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x59] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x5a] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x5b] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x5c] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x5d] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x5e] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x5f] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x60] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x61] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x62] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x63] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x64] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x65] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x66] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x67] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x68] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x69] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x6a] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x6b] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x6c] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x6d] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x6e] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x6f] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x70] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x71] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x72] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x73] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x74] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x75] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x76] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x77] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x78] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x79] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x7a] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x7b] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x7c] = {
+		.length = 2,
+		.callback = op_bit_7_h
+	},
+	[0x7d] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x7e] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x7f] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x80] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x81] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x82] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x83] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x84] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x85] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x86] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x87] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x88] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x89] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x8a] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x8b] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x8c] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x8d] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x8e] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x8f] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x90] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x91] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x92] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x93] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x94] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x95] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x96] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x97] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x98] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x99] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x9a] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x9b] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x9c] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x9d] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x9e] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0x9f] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xa0] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xa1] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xa2] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xa3] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xa4] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xa5] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xa6] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xa7] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xa8] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xa9] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xaa] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xab] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xac] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xad] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xae] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xaf] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xb0] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xb1] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xb2] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xb3] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xb4] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xb5] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xb6] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xb7] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xb8] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xb9] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xba] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xbb] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xbc] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xbd] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xbe] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xbf] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xc0] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xc1] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xc2] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xc3] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xc4] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xc5] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xc6] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xc7] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xc8] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xc9] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xca] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xcb] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xcc] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xcd] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xce] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xcf] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xd0] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xd1] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xd2] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xd3] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xd4] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xd5] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xd6] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xd7] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xd8] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xd9] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xda] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xdb] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xdc] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xdd] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xde] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xdf] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xe0] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xe1] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xe2] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xe3] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xe4] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xe5] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xe6] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xe7] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xe8] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xe9] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xea] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xeb] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xec] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xed] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xee] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xef] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xf0] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xf1] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xf2] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xf3] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xf4] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xf5] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xf6] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xf7] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xf8] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xf9] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xfa] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xfb] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xfc] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xfd] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xfe] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	},
+	[0xff] = {
+		.length = 2,
+		.callback = cb_not_implemented
+	}
 };
 
-void op_cb_lookup(struct State* state) 
+struct OpDefinition cb_decode(struct State* state, uint8_t pos)
 {
-	state->program_counter++;
-	cb_lookup[state->memory[state->program_counter]](state);
+	return cb_lookup[state->memory[pos]];
 }

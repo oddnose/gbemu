@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include "op/cb_lookup.h"
+#include "op/op_definition.h"
 #include "state.h"
 #include "op/op_lookup.h"
 
@@ -16,6 +18,9 @@ int main()
 {
 	load_rom();
 	while (state.program_counter <= rom_memory_end) {
-		run_op(&state);
+		struct OpDefinition def;
+		def = decode(&state, state.program_counter);
+		def.callback(&state);
+		state.program_counter += def.length;
 	}
 }

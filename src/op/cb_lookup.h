@@ -1,8 +1,5 @@
-#ifndef OP_CB_LOOKUP_H
-#define OP_CB_LOOKUP_H
+#pragma once
 
-#include "state.h"
+#include "op_definition.h"
 
-void op_cb_lookup(struct State* state);
-
-#endif
+struct OpDefinition cb_decode(struct State* state, uint8_t pos);
