@@ -12,6 +12,7 @@ set(SOURCE_FILES
 	src/op/cb_lookup.c
 	src/op/rotate_instructions.c
 	src/op/branch_instructions.c
+	src/state.c
 	src/main.c
 )
 

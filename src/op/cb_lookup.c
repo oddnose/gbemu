@@ -509,6 +509,7 @@ struct OpDefinition cb_lookup[256] = {
 		.callback = cb_not_implemented
 	},
 	[0x7c] = {
+		"BIT 7, H",
 		.length = 2,
 		.callback = op_bit_7_h
 	},
