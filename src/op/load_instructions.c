@@ -4,34 +4,31 @@
 
 void op_ld_sp_u16(struct State* state)
 {
-	char* result_sp = write_sp(state, ((unsigned short) state->memory[state->program_counter + 2] << 8) | state->memory[state->program_counter + 1]);
-	char* result_pc = write_pc(state, state->program_counter + 3);
-	printf("%s\n", result_sp);
-	printf("%s\n", result_pc);
+	struct MemoryUpdate result_sp = write_sp(state, read_short(state, read_pc(state) + 1));
+	struct MemoryUpdate result_pc = write_pc(state, read_pc(state) + 3);
 }
 
-void op_ld_hl_minus_a(struct State* state)
+void op_ld_hld_a(struct State* state)
 {
-	state->program_counter++;
+	//struct MemoryUpdate result_hl = write_reg_hl(state, read_short(state, read_pc(state) + 1));
+	//struct MemoryUpdate result_pc = write_pc(state, read_pc(state) + 3);
 }
 
 
 void op_ld_hl_u16(struct State* state)
 {
-	state->program_counter += 3;
+	struct MemoryUpdate result_hl = write_reg_hl(state, read_short(state, read_pc(state) + 1));
+	struct MemoryUpdate result_pc = write_pc(state, read_pc(state) + 3);
 }
 
 void op_ld_c_u8(struct State* state)
 {
-	state->program_counter++;
 }
 
 void op_ld_a_u8(struct State* state)
 {
-	state->program_counter++;
 }
 
 void op_ld_ff00_plus_c_a(struct State* state) 
 {
-	state->program_counter++;
 }

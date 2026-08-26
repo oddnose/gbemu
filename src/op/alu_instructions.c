@@ -4,13 +4,9 @@
 
 void op_xor_a_a(struct State* state)
 {
-	char* result_rega = write_reg_a(state, 0); // xor with itself will always be 0	
-	char* result_z = write_z_flag(state, 1);
-	char* result_pc = write_pc(state, state->program_counter + 1);
-
-	printf("%s\n", result_rega);
-	printf("%s\n", result_z);
-	printf("%s\n", result_pc);
+	struct MemoryUpdate result_rega = write_reg_a(state, 0); // xor with itself will always be 0	
+	struct MemoryUpdate result_z = write_z_flag(state, 1);
+	struct MemoryUpdate result_pc = write_pc(state, read_pc(state) + 1);
 
 	//TODO: also reset other flags
 }

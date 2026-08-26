@@ -10,13 +10,13 @@
 
 void op_invalid(struct State* state)
 {
-	printf("Instruction is invalid: $%02x\n", state->memory[state->program_counter]);
+	printf("Instruction is invalid: $%02x\n", read_pc(state));
 	exit(1);
 }
 
 void op_not_implemented(struct State* state)
 {
-	printf("Unknown instruction: $%02x\n", state->memory[state->program_counter]);
+	printf("Unknown instruction: $%02x\n", read_pc(state));
 	exit(1);
 }
 
@@ -72,7 +72,7 @@ struct OpDefinition op_lookup[256] = {
 	[0x2f] = { "CPL", 1 },
 	[0x30] = { "JR NC, $%02x", 2 },
 	[0x31] = { "LD SP, $%04x", 3, op_ld_sp_u16 },
-	[0x32] = { "LD (HL-), A", 1, op_ld_hl_minus_a, },
+	[0x32] = { "LD (HL-), A", 1, op_ld_hld_a },
 	[0x33] = { "INC SP", 1 },
 	[0x34] = { "INC (HL)", 1 },
 	[0x35] = { "DEC (HL)", 1 },
@@ -282,9 +282,9 @@ struct OpDefinition op_lookup[256] = {
 
 struct OpDefinition decode(struct State* state, uint8_t pos)
 {
-	if (state->memory[pos] == 0xcb) {
+	if (read_char(state, pos) == 0xcb) {
 		return cb_decode(state, pos + 1);
 	}
-	return op_lookup[state->memory[pos]];
+	return op_lookup[read_char(state, pos)];
 }
 

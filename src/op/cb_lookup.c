@@ -6,7 +6,7 @@
 
 void cb_not_implemented(struct State* state)
 {
-	printf("Unknown CB instruction: $%02x\n", state->memory[state->program_counter]);
+	printf("Unknown CB instruction: $%02x\n", read_pc(state));
 	exit(1);
 }
 
@@ -1039,7 +1039,7 @@ struct OpDefinition cb_lookup[256] = {
 	}
 };
 
-struct OpDefinition cb_decode(struct State* state, uint8_t pos)
+struct OpDefinition cb_decode(struct State* state, char pos)
 {
-	return cb_lookup[state->memory[pos]];
+	return cb_lookup[read_char(state, pos)];
 }
