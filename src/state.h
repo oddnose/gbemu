@@ -12,7 +12,6 @@ enum MemoryLocation {
 	RegE,
 	RegH,
 	RegL,
-	RegAF,
 	RegBC,
 	RegDE,
 	RegHL,
@@ -24,6 +23,7 @@ enum MemoryLocation {
 	CFlag,
 	Address
 };
+
 
 struct MemoryUpdate {
 	enum MemoryLocation location;
@@ -37,6 +37,7 @@ struct MemoryUpdate {
 		unsigned short new_val_16bit;
 		bool new_val_1bit;
 	};
+	unsigned short address; //TODO: only relevant for Address
 };
 
 struct State* create_state();
@@ -63,6 +64,9 @@ struct MemoryUpdate write_n_flag(struct State* state, bool value);
 struct MemoryUpdate write_h_flag(struct State* state, bool value);
 struct MemoryUpdate write_c_flag(struct State* state, bool value);
 
+struct MemoryUpdate write_addr(struct State* state, unsigned short addr, unsigned char value);
+
+
 // Read functions
 unsigned short read_short(struct State* state, unsigned short source_memory_location);
 unsigned char read_char(struct State* state, unsigned short source_memory_location);
@@ -81,7 +85,7 @@ unsigned short read_reg_hl(struct State* state);
 unsigned short read_sp(struct State* state);
 unsigned short read_pc(struct State* state);
 
-bool read_z_flag(struct State* state, bool value);
-bool read_n_flag(struct State* state, bool value);
-bool read_h_flag(struct State* state, bool value);
-bool read_c_flag(struct State* state, bool value);
+bool read_z_flag(struct State* state);
+bool read_n_flag(struct State* state);
+bool read_h_flag(struct State* state);
+bool read_c_flag(struct State* state);

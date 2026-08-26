@@ -1,10 +1,11 @@
 #include "cb_lookup.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "op/instruction_result.h"
 #include "op/op_definition.h"
 #include "rotate_instructions.h"
 
-void cb_not_implemented(struct State* state)
+struct InstructionResult cb_not_implemented(struct State* state)
 {
 	printf("Unknown CB instruction: $%02x\n", read_pc(state));
 	exit(1);

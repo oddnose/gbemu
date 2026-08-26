@@ -1,10 +1,11 @@
 #pragma once
 
+#include "op/instruction_result.h"
 #include "state.h"
 
-void op_ld_sp_u16(struct State* state);
-void op_ld_hld_a(struct State* state);
-void op_ld_hl_u16(struct State* state);
-void op_ld_c_u8(struct State* state);
-void op_ld_a_u8(struct State* state);
-void op_ld_ff00_plus_c_a(struct State* state);
+struct InstructionResult op_ld_sp_u16(struct State* state);
+struct InstructionResult op_ld_hld_a(struct State* state);
+struct InstructionResult op_ld_hl_u16(struct State* state);
+struct InstructionResult op_ld_c_u8(struct State* state);
+struct InstructionResult op_ld_a_u8(struct State* state);
+struct InstructionResult op_ld_ff00_plus_c_a(struct State* state);

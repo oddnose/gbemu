@@ -126,6 +126,8 @@ struct MemoryUpdate write_pc(struct State *state, unsigned short value)
 struct MemoryUpdate write_z_flag(struct State* state, bool value)
 {
 	bool old_val = state->reg_af & 0b10000000;
+	//TODO: find better way?
+	state->reg_af &= 0b01111111;
   state->reg_af |= ((unsigned short)value << 7);
 	struct MemoryUpdate result;
 	result.location = ZFlag;
@@ -135,7 +137,37 @@ struct MemoryUpdate write_z_flag(struct State* state, bool value)
   return result;
 }
 
+struct MemoryUpdate write_addr(struct State* state, unsigned short addr, unsigned char value)
+{
+	unsigned char old_val = state->memory[addr];
+	state->memory[addr] = value;
+	struct MemoryUpdate result;
+	result.location = Address;
+	result.old_val_8bit = old_val;
+	result.new_val_8bit = value;
+	result.address = addr;
+	
+  return result;
+
+}
+
 // Read functions
+
+unsigned char read_reg_a(struct State* state)
+{
+	return state->reg_af >> 8;
+}
+
+unsigned char read_reg_h(struct State* state)
+{
+	return state->reg_hl >> 8;
+}
+
+
+unsigned short read_reg_hl(struct State* state)
+{
+	return state->reg_hl;
+}
 
 unsigned short read_sp(struct State* state)
 {
@@ -145,4 +177,9 @@ unsigned short read_sp(struct State* state)
 unsigned short read_pc(struct State* state)
 {
 	return state->program_counter;
+}
+
+bool read_z_flag(struct State* state) 
+{
+	return state->reg_af >> 7;
 }
