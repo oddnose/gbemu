@@ -4,1043 +4,275 @@
 #include "op/instruction_result.h"
 #include "op/op_definition.h"
 #include "rotate_instructions.h"
+#include "state.h"
 
 struct InstructionResult cb_not_implemented(struct State* state)
 {
-	printf("Unknown CB instruction: $%02x\n", read_pc(state));
+	printf("Unknown CB instruction: $%02x\n", read_addr(state, read_reg_16bit(state, ProgramCounter) + 1));
 	exit(1);
 }
 
 // Initialize lookup table with function pointers
 struct OpDefinition cb_lookup[256] = {
-	[0x00] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x01] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x02] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x03] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x04] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x05] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x06] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x07] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x08] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x09] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x0a] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x0b] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x0c] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x0d] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x0e] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x0f] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x10] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x11] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x12] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x13] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x14] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x15] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x16] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x17] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x18] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x19] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x1a] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x1b] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x1c] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x1d] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x1e] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x1f] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x20] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x21] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x22] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x23] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x24] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x25] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x26] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x27] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x28] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x29] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x2a] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x2b] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x2c] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x2d] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x2e] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x2f] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x30] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x31] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x32] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x33] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x34] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x35] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x36] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x37] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x38] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x39] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x3a] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x3b] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x3c] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x3d] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x3e] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x3f] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x40] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x41] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x42] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x43] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x44] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x45] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x46] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x47] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x48] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x49] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x4a] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x4b] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x4c] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x4d] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x4e] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x4f] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x50] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x51] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x52] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x53] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x54] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x55] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x56] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x57] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x58] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x59] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x5a] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x5b] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x5c] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x5d] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x5e] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x5f] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x60] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x61] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x62] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x63] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x64] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x65] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x66] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x67] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x68] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x69] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x6a] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x6b] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x6c] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x6d] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x6e] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x6f] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x70] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x71] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x72] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x73] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x74] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x75] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x76] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x77] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x78] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x79] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x7a] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x7b] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x7c] = {
-		"BIT 7, H",
-		.length = 2,
-		.callback = op_bit_7_h
-	},
-	[0x7d] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x7e] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x7f] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x80] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x81] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x82] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x83] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x84] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x85] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x86] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x87] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x88] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x89] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x8a] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x8b] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x8c] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x8d] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x8e] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x8f] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x90] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x91] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x92] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x93] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x94] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x95] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x96] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x97] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x98] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x99] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x9a] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x9b] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x9c] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x9d] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x9e] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0x9f] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xa0] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xa1] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xa2] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xa3] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xa4] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xa5] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xa6] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xa7] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xa8] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xa9] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xaa] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xab] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xac] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xad] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xae] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xaf] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xb0] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xb1] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xb2] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xb3] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xb4] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xb5] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xb6] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xb7] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xb8] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xb9] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xba] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xbb] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xbc] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xbd] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xbe] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xbf] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xc0] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xc1] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xc2] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xc3] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xc4] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xc5] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xc6] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xc7] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xc8] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xc9] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xca] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xcb] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xcc] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xcd] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xce] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xcf] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xd0] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xd1] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xd2] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xd3] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xd4] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xd5] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xd6] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xd7] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xd8] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xd9] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xda] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xdb] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xdc] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xdd] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xde] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xdf] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xe0] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xe1] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xe2] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xe3] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xe4] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xe5] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xe6] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xe7] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xe8] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xe9] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xea] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xeb] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xec] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xed] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xee] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xef] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xf0] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xf1] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xf2] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xf3] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xf4] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xf5] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xf6] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xf7] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xf8] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xf9] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xfa] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xfb] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xfc] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xfd] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xfe] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	},
-	[0xff] = {
-		.length = 2,
-		.callback = cb_not_implemented
-	}
+	[0x00] = { "RLC B", 2, cb_not_implemented },
+	[0x01] = { "RLC C", 2, cb_not_implemented },
+	[0x02] = { "RLC D", 2, cb_not_implemented },
+	[0x03] = { "RLC E", 2, cb_not_implemented },
+	[0x04] = { "RLC H", 2, cb_not_implemented },
+	[0x05] = { "RLC L", 2, cb_not_implemented },
+	[0x06] = { "RLC (HL)", 2, cb_not_implemented },
+	[0x07] = { "RLC A", 2, cb_not_implemented },
+	[0x08] = { "RRC B", 2, cb_not_implemented },
+	[0x09] = { "RRC C", 2, cb_not_implemented },
+	[0x0a] = { "RRC D", 2, cb_not_implemented },
+	[0x0b] = { "RRC E", 2, cb_not_implemented },
+	[0x0c] = { "RRC H", 2, cb_not_implemented },
+	[0x0d] = { "RRC L", 2, cb_not_implemented },
+	[0x0e] = { "RRC (HL)", 2, cb_not_implemented },
+	[0x0f] = { "RRC A", 2, cb_not_implemented },
+	[0x10] = { "RL B", 2, cb_not_implemented },
+	[0x11] = { "RL C", 2, op_rl_c },
+	[0x12] = { "RL D", 2, cb_not_implemented },
+	[0x13] = { "RL E", 2, cb_not_implemented },
+	[0x14] = { "RL H", 2, cb_not_implemented },
+	[0x15] = { "RL L", 2, cb_not_implemented },
+	[0x16] = { "RL (HL)", 2, cb_not_implemented },
+	[0x17] = { "RL A", 2, cb_not_implemented },
+	[0x18] = { "RR B", 2, cb_not_implemented },
+	[0x19] = { "RR C", 2, cb_not_implemented },
+	[0x1a] = { "RR D", 2, cb_not_implemented },
+	[0x1b] = { "RR E", 2, cb_not_implemented },
+	[0x1c] = { "RR H", 2, cb_not_implemented },
+	[0x1d] = { "RR L", 2, cb_not_implemented },
+	[0x1e] = { "RR (HL)", 2, cb_not_implemented },
+	[0x1f] = { "RR A", 2, cb_not_implemented },
+	[0x20] = { "SLA B", 2, cb_not_implemented },
+	[0x21] = { "SLA C", 2, cb_not_implemented },
+	[0x22] = { "SLA D", 2, cb_not_implemented },
+	[0x23] = { "SLA E", 2, cb_not_implemented },
+	[0x24] = { "SLA H", 2, cb_not_implemented },
+	[0x25] = { "SLA L", 2, cb_not_implemented },
+	[0x26] = { "SLA (HL)", 2, cb_not_implemented },
+	[0x27] = { "SLA A", 2, cb_not_implemented },
+	[0x28] = { "SRA B", 2, cb_not_implemented },
+	[0x29] = { "SRA C", 2, cb_not_implemented },
+	[0x2a] = { "SRA D", 2, cb_not_implemented },
+	[0x2b] = { "SRA E", 2, cb_not_implemented },
+	[0x2c] = { "SRA H", 2, cb_not_implemented },
+	[0x2d] = { "SRA L", 2, cb_not_implemented },
+	[0x2e] = { "SRA (HL)", 2, cb_not_implemented },
+	[0x2f] = { "SRA A", 2, cb_not_implemented },
+	[0x30] = { "SWAP B", 2, cb_not_implemented },
+	[0x31] = { "SWAP C", 2, cb_not_implemented },
+	[0x32] = { "SWAP D", 2, cb_not_implemented },
+	[0x33] = { "SWAP E", 2, cb_not_implemented },
+	[0x34] = { "SWAP H", 2, cb_not_implemented },
+	[0x35] = { "SWAP L", 2, cb_not_implemented },
+	[0x36] = { "SWAP (HL)", 2, cb_not_implemented },
+	[0x37] = { "SWAP A", 2, cb_not_implemented },
+	[0x38] = { "SRL B", 2, cb_not_implemented },
+	[0x39] = { "SRL C", 2, cb_not_implemented },
+	[0x3a] = { "SRL D", 2, cb_not_implemented },
+	[0x3b] = { "SRL E", 2, cb_not_implemented },
+	[0x3c] = { "SRL H", 2, cb_not_implemented },
+	[0x3d] = { "SRL L", 2, cb_not_implemented },
+	[0x3e] = { "SRL (HL)", 2, cb_not_implemented },
+	[0x3f] = { "SRL A", 2, cb_not_implemented },
+	[0x40] = { "BIT 0, B", 2, cb_not_implemented },
+	[0x41] = { "BIT 0, C", 2, cb_not_implemented },
+	[0x42] = { "BIT 0, D", 2, cb_not_implemented },
+	[0x43] = { "BIT 0, E", 2, cb_not_implemented },
+	[0x44] = { "BIT 0, H", 2, cb_not_implemented },
+	[0x45] = { "BIT 0, L", 2, cb_not_implemented },
+	[0x46] = { "BIT 0, (HL)", 2, cb_not_implemented },
+	[0x47] = { "BIT 0, A", 2, cb_not_implemented },
+	[0x48] = { "BIT 1, B", 2, cb_not_implemented },
+	[0x49] = { "BIT 1, C", 2, cb_not_implemented },
+	[0x4a] = { "BIT 1, D", 2, cb_not_implemented },
+	[0x4b] = { "BIT 1, E", 2, cb_not_implemented },
+	[0x4c] = { "BIT 1, H", 2, cb_not_implemented },
+	[0x4d] = { "BIT 1, L", 2, cb_not_implemented },
+	[0x4e] = { "BIT 1, (HL)", 2, cb_not_implemented },
+	[0x4f] = { "BIT 1, A", 2, cb_not_implemented },
+	[0x50] = { "BIT 2, B", 2, cb_not_implemented },
+	[0x51] = { "BIT 2, C", 2, cb_not_implemented },
+	[0x52] = { "BIT 2, D", 2, cb_not_implemented },
+	[0x53] = { "BIT 2, E", 2, cb_not_implemented },
+	[0x54] = { "BIT 2, H", 2, cb_not_implemented },
+	[0x55] = { "BIT 2, L", 2, cb_not_implemented },
+	[0x56] = { "BIT 2, (HL)", 2, cb_not_implemented },
+	[0x57] = { "BIT 2, A", 2, cb_not_implemented },
+	[0x58] = { "BIT 3, B", 2, cb_not_implemented },
+	[0x59] = { "BIT 3, C", 2, cb_not_implemented },
+	[0x5a] = { "BIT 3, D", 2, cb_not_implemented },
+	[0x5b] = { "BIT 3, E", 2, cb_not_implemented },
+	[0x5c] = { "BIT 3, H", 2, cb_not_implemented },
+	[0x5d] = { "BIT 3, L", 2, cb_not_implemented },
+	[0x5e] = { "BIT 3, (HL)", 2, cb_not_implemented },
+	[0x5f] = { "BIT 3, A", 2, cb_not_implemented },
+	[0x60] = { "BIT 4, B", 2, cb_not_implemented },
+	[0x61] = { "BIT 4, C", 2, cb_not_implemented },
+	[0x62] = { "BIT 4, D", 2, cb_not_implemented },
+	[0x63] = { "BIT 4, E", 2, cb_not_implemented },
+	[0x64] = { "BIT 4, H", 2, cb_not_implemented },
+	[0x65] = { "BIT 4, L", 2, cb_not_implemented },
+	[0x66] = { "BIT 4, (HL)", 2, cb_not_implemented },
+	[0x67] = { "BIT 4, A", 2, cb_not_implemented },
+	[0x68] = { "BIT 5, B", 2, cb_not_implemented },
+	[0x69] = { "BIT 5, C", 2, cb_not_implemented },
+	[0x6a] = { "BIT 5, D", 2, cb_not_implemented },
+	[0x6b] = { "BIT 5, E", 2, cb_not_implemented },
+	[0x6c] = { "BIT 5, H", 2, cb_not_implemented },
+	[0x6d] = { "BIT 5, L", 2, cb_not_implemented },
+	[0x6e] = { "BIT 5, (HL)", 2, cb_not_implemented },
+	[0x6f] = { "BIT 5, A", 2, cb_not_implemented },
+	[0x70] = { "BIT 6, B", 2, cb_not_implemented },
+	[0x71] = { "BIT 6, C", 2, cb_not_implemented },
+	[0x72] = { "BIT 6, D", 2, cb_not_implemented },
+	[0x73] = { "BIT 6, E", 2, cb_not_implemented },
+	[0x74] = { "BIT 6, H", 2, cb_not_implemented },
+	[0x75] = { "BIT 6, L", 2, cb_not_implemented },
+	[0x76] = { "BIT 6, (HL)", 2, cb_not_implemented },
+	[0x77] = { "BIT 6, A", 2, cb_not_implemented },
+	[0x78] = { "BIT 7, B", 2, cb_not_implemented },
+	[0x79] = { "BIT 7, C", 2, cb_not_implemented },
+	[0x7a] = { "BIT 7, D", 2, cb_not_implemented },
+	[0x7b] = { "BIT 7, E", 2, cb_not_implemented },
+	[0x7c] = { "BIT 7, H", 2, op_bit_7_h }, 
+	[0x7d] = { "BIT 7, L", 2, cb_not_implemented }, 
+	[0x7e] = { "BIT 7, (HL)", 2, cb_not_implemented },
+	[0x7f] = { "BIT 7, A", 2, cb_not_implemented },
+	[0x80] = { "RES 0, B", 2, cb_not_implemented },
+	[0x81] = { "RES 0, C", 2, cb_not_implemented },
+	[0x82] = { "RES 0, D", 2, cb_not_implemented },
+	[0x83] = { "RES 0, E", 2, cb_not_implemented },
+	[0x84] = { "RES 0, H", 2, cb_not_implemented },
+	[0x85] = { "RES 0, L", 2, cb_not_implemented },
+	[0x86] = { "RES 0, (HL)", 2, cb_not_implemented },
+	[0x87] = { "RES 0, A", 2, cb_not_implemented },
+	[0x88] = { "RES 1, B", 2, cb_not_implemented },
+	[0x89] = { "RES 1, C", 2, cb_not_implemented },
+	[0x8a] = { "RES 1, D", 2, cb_not_implemented },
+	[0x8b] = { "RES 1, E", 2, cb_not_implemented },
+	[0x8c] = { "RES 1, H", 2, cb_not_implemented },
+	[0x8d] = { "RES 1, L", 2, cb_not_implemented },
+	[0x8e] = { "RES 1, (HL)", 2, cb_not_implemented },
+	[0x8f] = { "RES 1, A", 2, cb_not_implemented },
+	[0x90] = { "RES 2, B", 2, cb_not_implemented },
+	[0x91] = { "RES 2, C", 2, cb_not_implemented },
+	[0x92] = { "RES 2, D", 2, cb_not_implemented },
+	[0x93] = { "RES 2, E", 2, cb_not_implemented },
+	[0x94] = { "RES 2, H", 2, cb_not_implemented },
+	[0x95] = { "RES 2, L", 2, cb_not_implemented },
+	[0x96] = { "RES 2, (HL)", 2, cb_not_implemented },
+	[0x97] = { "RES 2, A", 2, cb_not_implemented },
+	[0x98] = { "RES 3, B", 2, cb_not_implemented },
+	[0x99] = { "RES 3, C", 2, cb_not_implemented },
+	[0x9a] = { "RES 3, D", 2, cb_not_implemented },
+	[0x9b] = { "RES 3, E", 2, cb_not_implemented },
+	[0x9c] = { "RES 3, H", 2, cb_not_implemented },
+	[0x9d] = { "RES 3, L", 2, cb_not_implemented },
+	[0x9e] = { "RES 3, (HL)", 2, cb_not_implemented },
+	[0x9f] = { "RES 3, A", 2, cb_not_implemented },
+	[0xa0] = { "RES 4, B", 2, cb_not_implemented },
+	[0xa1] = { "RES 4, C", 2, cb_not_implemented },
+	[0xa2] = { "RES 4, D", 2, cb_not_implemented },
+	[0xa3] = { "RES 4, E", 2, cb_not_implemented },
+	[0xa4] = { "RES 4, H", 2, cb_not_implemented },
+	[0xa5] = { "RES 4, L", 2, cb_not_implemented },
+	[0xa6] = { "RES 4, (HL)", 2, cb_not_implemented },
+	[0xa7] = { "RES 4, A", 2, cb_not_implemented },
+	[0xa8] = { "RES 5, B", 2, cb_not_implemented },
+	[0xa9] = { "RES 5, C", 2, cb_not_implemented },
+	[0xaa] = { "RES 5, D", 2, cb_not_implemented },
+	[0xab] = { "RES 5, E", 2, cb_not_implemented },
+	[0xac] = { "RES 5, H", 2, cb_not_implemented },
+	[0xad] = { "RES 5, L", 2, cb_not_implemented },
+	[0xae] = { "RES 5, (HL)", 2, cb_not_implemented },
+	[0xaf] = { "RES 5, A", 2, cb_not_implemented },
+	[0xb0] = { "RES 6, B", 2, cb_not_implemented },
+	[0xb1] = { "RES 6, C", 2, cb_not_implemented },
+	[0xb2] = { "RES 6, D", 2, cb_not_implemented },
+	[0xb3] = { "RES 6, E", 2, cb_not_implemented },
+	[0xb4] = { "RES 6, H", 2, cb_not_implemented },
+	[0xb5] = { "RES 6, L", 2, cb_not_implemented },
+	[0xb6] = { "RES 6, (HL)", 2, cb_not_implemented },
+	[0xb7] = { "RES 6, A", 2, cb_not_implemented },
+	[0xb8] = { "RES 7, B", 2, cb_not_implemented },
+	[0xb9] = { "RES 7, C", 2, cb_not_implemented },
+	[0xba] = { "RES 7, D", 2, cb_not_implemented },
+	[0xbb] = { "RES 7, E", 2, cb_not_implemented },
+	[0xbc] = { "RES 7, H", 2, cb_not_implemented },
+	[0xbd] = { "RES 7, L", 2, cb_not_implemented },
+	[0xbe] = { "RES 7, (HL)", 2, cb_not_implemented },
+	[0xbf] = { "RES 7, A", 2, cb_not_implemented },
+	[0xc0] = { "SET 0, B", 2, cb_not_implemented },
+	[0xc1] = { "SET 0, C", 2, cb_not_implemented },
+	[0xc2] = { "SET 0, D", 2, cb_not_implemented },
+	[0xc3] = { "SET 0, E", 2, cb_not_implemented },
+	[0xc4] = { "SET 0, H", 2, cb_not_implemented },
+	[0xc5] = { "SET 0, L", 2, cb_not_implemented },
+	[0xc6] = { "SET 0, (HL)", 2, cb_not_implemented },
+	[0xc7] = { "SET 0, A", 2, cb_not_implemented },
+	[0xc8] = { "SET 1, B", 2, cb_not_implemented },
+	[0xc9] = { "SET 1, C", 2, cb_not_implemented },
+	[0xca] = { "SET 1, D", 2, cb_not_implemented },
+	[0xcb] = { "SET 1, E", 2, cb_not_implemented },
+	[0xcc] = { "SET 1, H", 2, cb_not_implemented },
+	[0xcd] = { "SET 1, L", 2, cb_not_implemented },
+	[0xce] = { "SET 1, (HL)", 2, cb_not_implemented },
+	[0xcf] = { "SET 1, A", 2, cb_not_implemented },
+	[0xd0] = { "SET 2, B", 2, cb_not_implemented },
+	[0xd1] = { "SET 2, C", 2, cb_not_implemented },
+	[0xd2] = { "SET 2, D", 2, cb_not_implemented },
+	[0xd3] = { "SET 2, E", 2, cb_not_implemented },
+	[0xd4] = { "SET 2, H", 2, cb_not_implemented },
+	[0xd5] = { "SET 2, L", 2, cb_not_implemented },
+	[0xd6] = { "SET 2, (HL)", 2, cb_not_implemented },
+	[0xd7] = { "SET 2, A", 2, cb_not_implemented },
+	[0xd8] = { "SET 3, B", 2, cb_not_implemented },
+	[0xd9] = { "SET 3, C", 2, cb_not_implemented },
+	[0xda] = { "SET 3, D", 2, cb_not_implemented },
+	[0xdb] = { "SET 3, E", 2, cb_not_implemented },
+	[0xdc] = { "SET 3, H", 2, cb_not_implemented },
+	[0xdd] = { "SET 3, L", 2, cb_not_implemented },
+	[0xde] = { "SET 3, (HL)", 2, cb_not_implemented },
+	[0xdf] = { "SET 3, A", 2, cb_not_implemented },
+	[0xe0] = { "SET 4, B", 2, cb_not_implemented },
+	[0xe1] = { "SET 4, C", 2, cb_not_implemented },
+	[0xe2] = { "SET 4, D", 2, cb_not_implemented },
+	[0xe3] = { "SET 4, E", 2, cb_not_implemented },
+	[0xe4] = { "SET 4, H", 2, cb_not_implemented },
+	[0xe5] = { "SET 4, L", 2, cb_not_implemented },
+	[0xe6] = { "SET 4, (HL)", 2, cb_not_implemented },
+	[0xe7] = { "SET 4, A", 2, cb_not_implemented },
+	[0xe8] = { "SET 5, B", 2, cb_not_implemented },
+	[0xe9] = { "SET 5, C", 2, cb_not_implemented },
+	[0xea] = { "SET 5, D", 2, cb_not_implemented },
+	[0xeb] = { "SET 5, E", 2, cb_not_implemented },
+	[0xec] = { "SET 5, H", 2, cb_not_implemented },
+	[0xed] = { "SET 5, L", 2, cb_not_implemented },
+	[0xee] = { "SET 5, (HL)", 2, cb_not_implemented },
+	[0xef] = { "SET 5, A", 2, cb_not_implemented },
+	[0xf0] = { "SET 6, B", 2, cb_not_implemented },
+	[0xf1] = { "SET 6, C", 2, cb_not_implemented },
+	[0xf2] = { "SET 6, D", 2, cb_not_implemented },
+	[0xf3] = { "SET 6, E", 2, cb_not_implemented },
+	[0xf4] = { "SET 6, H", 2, cb_not_implemented },
+	[0xf5] = { "SET 6, L", 2, cb_not_implemented },
+	[0xf6] = { "SET 6, (HL)", 2, cb_not_implemented },
+	[0xf7] = { "SET 6, A", 2, cb_not_implemented },
+	[0xf8] = { "SET 7, B", 2, cb_not_implemented },
+	[0xf9] = { "SET 7, C", 2, cb_not_implemented },
+	[0xfa] = { "SET 7, D", 2, cb_not_implemented },
+	[0xfb] = { "SET 7, E", 2, cb_not_implemented },
+	[0xfc] = { "SET 7, H", 2, cb_not_implemented },
+	[0xfd] = { "SET 7, L", 2, cb_not_implemented },
+	[0xfe] = { "SET 7, (HL)", 2, cb_not_implemented },
+	[0xff] = { "SET 7, A", 2, cb_not_implemented }
 };
 
-struct OpDefinition cb_decode(struct State* state, char pos)
+struct OpDefinition cb_decode(struct State* state, unsigned char pos)
 {
 	return cb_lookup[read_char(state, pos)];
 }

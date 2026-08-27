@@ -69,10 +69,10 @@ int main()
 	state = create_state();
 	load_rom(state, "res/dmg.bin");
 	uint8_t pos = 0;
-	while (read_pc(state) < 0x3FFF) {
+	while (read_reg_16bit(state, ProgramCounter) < 0x00FF) {
 		struct OpDefinition def;
-		def = decode(state, read_pc(state));
-		print_instruction(def, read_pc(state));
+		def = decode(state, read_reg_16bit(state, ProgramCounter));
+		print_instruction(def, read_reg_16bit(state, ProgramCounter));
 		if (!def.callback) {
 			printf("Instruction not implemented!");
 		}

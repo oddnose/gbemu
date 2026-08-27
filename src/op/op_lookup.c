@@ -8,16 +8,18 @@
 #include "op/cb_lookup.h"
 #include "branch_instructions.h"
 #include "op/instruction_result.h"
+#include "op/rotate_instructions.h"
+#include "state.h"
 
 struct InstructionResult op_invalid(struct State* state)
 {
-	printf("Instruction is invalid: $%02x\n", read_pc(state));
+	printf("Instruction is invalid: $%02x\n", read_addr(state, read_reg_16bit(state, ProgramCounter)));
 	exit(1);
 }
 
 struct InstructionResult op_not_implemented(struct State* state)
 {
-	printf("Unknown instruction: $%02x\n", read_pc(state));
+	printf("Unknown instruction: $%02x\n", read_addr(state, read_reg_16bit(state, ProgramCounter)));
 	exit(1);
 }
 
@@ -29,27 +31,27 @@ struct OpDefinition op_lookup[256] = {
 	[0x03] = { "INC BC", 1, op_not_implemented },
 	[0x04] = { "INC B", 1, op_not_implemented },
 	[0x05] = { "DEC B", 1, op_not_implemented },
-	[0x06] = { "LD B, $%02x", 2, op_not_implemented },
+	[0x06] = { "LD B, $%02x", 2, op_ld_b_u8 },
 	[0x07] = { "RLCA", 1, op_not_implemented },
 	[0x08] = { "LD ($%04x), SP", 3, op_not_implemented },
 	[0x09] = { "ADD HL, BC", 1, op_not_implemented },
 	[0x0a] = { "LD A, (BC)", 1, op_not_implemented },
 	[0x0b] = { "DEC BC", 1, op_not_implemented },
-	[0x0c] = { "INC C", 1, op_not_implemented },
+	[0x0c] = { "INC C", 1, op_inc_c },
 	[0x0d] = { "DEC C", 1, op_not_implemented },
 	[0x0e] = { "LD C, $%02x", 2, op_ld_c_u8 },
 	[0x0f] = { "RRCA", 1, op_not_implemented },
 	[0x10] = { "STOP", 1, op_not_implemented },
-	[0x11] = { "LD DE, $%04x", 3, op_not_implemented },
+	[0x11] = { "LD DE, $%04x", 3, op_ld_de_u16 },
 	[0x12] = { "LD (DE), A", 1, op_not_implemented },
 	[0x13] = { "INC DE", 1, op_not_implemented },
 	[0x14] = { "INC D", 1, op_not_implemented },
 	[0x15] = { "DEC D", 1, op_not_implemented },
 	[0x16] = { "LD D, $%02x", 2, op_not_implemented },
-	[0x17] = { "RLA", 1, op_not_implemented },
+	[0x17] = { "RLA", 1, op_rla },
 	[0x18] = { "JR $%02x", 2, op_not_implemented },
 	[0x19] = { "ADD HL, DE", 1, op_not_implemented },
-	[0x1a] = { "LD A, (DE)", 1, op_not_implemented },
+	[0x1a] = { "LD A, (DE)", 1, op_ld_a_de },
 	[0x1b] = { "DEC DE", 1, op_not_implemented },
 	[0x1c] = { "INC E", 1, op_not_implemented },
 	[0x1d] = { "DEC E", 1, op_not_implemented },
@@ -94,7 +96,7 @@ struct OpDefinition op_lookup[256] = {
 	[0x44] = { "LD B, H", 1, op_not_implemented },
 	[0x45] = { "LD B, L", 1, op_not_implemented },
 	[0x46] = { "LD B, (HL)", 1, op_not_implemented },
-	[0x47] = { "LD B, A", 1, op_not_implemented },
+	[0x47] = { "LD B, A", 1, op_ld_b_a },
 	[0x48] = { "LD C, B", 1, op_not_implemented },
 	[0x49] = { "LD C, C", 1, op_not_implemented },
 	[0x4a] = { "LD C, D", 1, op_not_implemented },
@@ -102,7 +104,7 @@ struct OpDefinition op_lookup[256] = {
 	[0x4c] = { "LD C, H", 1, op_not_implemented },
 	[0x4d] = { "LD C, L", 1, op_not_implemented },
 	[0x4e] = { "LD C, (HL)", 1, op_not_implemented },
-	[0x4f] = { "LD C, A", 1, op_not_implemented },
+	[0x4f] = { "LD C, A", 1, op_ld_c_a },
 	[0x50] = { "LD D, B", 1, op_not_implemented },
 	[0x51] = { "LD D, C", 1, op_not_implemented },
 	[0x52] = { "LD D, D", 1, op_not_implemented },
@@ -142,7 +144,7 @@ struct OpDefinition op_lookup[256] = {
 	[0x74] = { "LD (HL), H", 1, op_not_implemented },
 	[0x75] = { "LD (HL), L", 1, op_not_implemented },
 	[0x76] = { "HALT", 1, op_not_implemented },
-	[0x77] = { "LD (HL), A", 1, op_not_implemented },
+	[0x77] = { "LD (HL), A", 1, op_ld_hl_a },
 	[0x78] = { "LD A, B", 1, op_not_implemented },
 	[0x79] = { "LD A, C", 1, op_not_implemented },
 	[0x7a] = { "LD A, D", 1, op_not_implemented },
@@ -216,11 +218,11 @@ struct OpDefinition op_lookup[256] = {
 	[0xbe] = { "CP A, (HL)", 1, op_not_implemented },
 	[0xbf] = { "CP A, A", 1, op_not_implemented },
 	[0xc0] = { "RET NZ", 1, op_not_implemented },
-	[0xc1] = { "POP BC", 1, op_not_implemented },
+	[0xc1] = { "POP BC", 1, op_pop_bc },
 	[0xc2] = { "JP NZ, $%04x", 3, op_not_implemented },
 	[0xc3] = { "JP $%04x", 3, op_not_implemented },
 	[0xc4] = { "CALL NZ, $%04x", 3, op_not_implemented },
-	[0xc5] = { "PUSH BC", 1, op_not_implemented },
+	[0xc5] = { "PUSH BC", 1, op_push_bc },
 	[0xc6] = { "ADD A, $%02x", 2, op_not_implemented },
 	[0xc7] = { "RST 00h", 1, op_not_implemented },
 	[0xc8] = { "RET Z", 1, op_not_implemented },
@@ -228,7 +230,7 @@ struct OpDefinition op_lookup[256] = {
 	[0xca] = { "JP Z, $%04x", 3, op_not_implemented },
 	[0xcb] = { .callback = op_invalid }, // PREFIX CB
 	[0xcc] = { "CALL Z, $%04x", 3, op_not_implemented },
-	[0xcd] = { "CALL $%04x", 3, op_not_implemented },
+	[0xcd] = { "CALL $%04x", 3, op_call_u16 },
 	[0xce] = { "ADC A, $%02x", 2, op_not_implemented },
 	[0xcf] = { "RST 08h", 1, op_not_implemented },
 	[0xd0] = { "RET NC", 1, op_not_implemented },
@@ -247,7 +249,7 @@ struct OpDefinition op_lookup[256] = {
 	[0xdd] = { .callback = op_invalid }, // NONE
 	[0xde] = { "SBC A, $%02x", 2, op_not_implemented },
 	[0xdf] = { "RST 18h", 1, op_not_implemented },
-	[0xe0] = { "LD (FF00+$%02x), A", 2, op_not_implemented },
+	[0xe0] = { "LD (FF00+$%02x), A", 2, op_ld_ff00_plus_u8_a },
 	[0xe1] = { "POP HL", 1, op_not_implemented },
 	[0xe2] = { "LD (FF00+C), A", 1, op_ld_ff00_plus_c_a },
 	[0xe3] = { .callback = op_invalid }, // NONE
@@ -281,7 +283,7 @@ struct OpDefinition op_lookup[256] = {
 	[0xff] = { "RST 38h", 1, op_not_implemented },
 };
 
-struct OpDefinition decode(struct State* state, uint8_t pos)
+struct OpDefinition decode(struct State* state, unsigned char pos)
 {
 	if (read_char(state, pos) == 0xcb) {
 		return cb_decode(state, pos + 1);

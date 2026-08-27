@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 struct State {
-	unsigned char memory[8000];
+	unsigned char memory[0x10000];
 	unsigned short reg_af; // Accumulator and flags
 	unsigned short reg_bc; 
 	unsigned short reg_de;
@@ -37,90 +37,94 @@ unsigned short read_short(struct State* state, unsigned short source_memory_loca
 	return (unsigned short) state->memory[source_memory_location + 1] << 8 | state->memory[source_memory_location];
 }
 
-
-struct MemoryUpdate write_reg_a(struct State* state, unsigned char value)
+struct MemoryUpdate write_upper_byte(enum MemoryLocation location, unsigned short* reg, unsigned char value)
 {
-  unsigned char old_val = state->reg_af >> 8;
-	unsigned short new_val = (unsigned short) value << 8;
-  state->reg_af |= new_val;
+  unsigned char old_val = *reg >> 8;
+  *reg = (*reg & 0x00FF) | ((unsigned short) value << 8);
 
 	struct MemoryUpdate result;
-	result.location = RegA;
+	result.location = location;
 	result.old_val_8bit = old_val;
-	result.new_val_8bit = new_val;
+	result.new_val_8bit = value;
 	
   return result;
 }
-// char* write_reg_b(unsigned char value);
-// char* write_reg_c(unsigned char value);
-// char* write_reg_d(unsigned char value);
-// char* write_reg_e(unsigned char value);
 
-struct MemoryUpdate write_reg_h(struct State* state, unsigned char value)
+struct MemoryUpdate write_lower_byte(enum MemoryLocation location, unsigned short* reg, unsigned char value)
 {
-  unsigned char old_val = state->reg_hl >> 8;
-	unsigned short new_val = (unsigned short) value << 8;
-  state->reg_hl |= new_val;
+  unsigned char old_val = *reg;
+  *reg = (*reg & 0xFF00) | value;
 
 	struct MemoryUpdate result;
-	result.location = RegH;
+	result.location = location;
 	result.old_val_8bit = old_val;
-	result.new_val_8bit = new_val;
+	result.new_val_8bit = value;
 	
   return result;
 }
 
-struct MemoryUpdate write_reg_l(struct State* state, unsigned char value)
-{
-  unsigned char old_val = (unsigned char) state->reg_hl;
-	unsigned short new_val = (unsigned short) value;
-  state->reg_hl |= new_val;
-
+struct MemoryUpdate write_reg(enum MemoryLocation location, unsigned short* reg, unsigned short value) {
+  unsigned short old_val = *reg;
+  *reg = value;
 	struct MemoryUpdate result;
-	result.location = RegL;
-	result.old_val_8bit = old_val;
-	result.new_val_8bit = new_val;
-	
-  return result;
-}
-
-// char* write_reg_af(unsigned short value);
-// char* write_reg_bc(unsigned short value);
-// char* write_reg_de(unsigned short value);
-struct MemoryUpdate write_reg_hl(struct State* state, unsigned short value)
-{
-  unsigned short old_val = state->reg_hl;
-  state->reg_hl = value;
-	struct MemoryUpdate result;
-	result.location = RegHL;
+	result.location = location;
 	result.old_val_16bit = old_val;
-	result.new_val_16bit = state->reg_hl;
+	result.new_val_16bit = *reg;
 	
   return result;
 }
 
-struct MemoryUpdate write_sp(struct State *state, unsigned short value)
+struct MemoryUpdate write_reg_8bit(struct State* state, enum MemoryLocation reg, unsigned char value)
 {
-  unsigned short old_val = state->stack_pointer;
-  state->stack_pointer = value;
-	struct MemoryUpdate result;
-	result.location = StackPointer;
-	result.old_val_16bit = old_val;
-	result.new_val_16bit = state->stack_pointer;
-	
-  return result;
+	switch (reg) {
+		case RegA: return write_upper_byte(RegA, &state->reg_af, value);
+		case RegB: return write_upper_byte(RegB, &state->reg_bc, value);
+		case RegC: return write_lower_byte(RegC, &state->reg_bc, value);
+		case RegD: return write_upper_byte(RegD, &state->reg_de, value); 
+		case RegE: return write_lower_byte(RegE, &state->reg_de, value); 
+		case RegH: return write_upper_byte(RegH, &state->reg_hl, value); 
+		case RegL: return write_lower_byte(RegL, &state->reg_hl, value); 
+
+		case RegBC:
+		case RegDE:
+		case RegHL:
+		case StackPointer:
+		case ProgramCounter:
+		case ZFlag:
+		case NFlag:
+		case HFlag:
+		case CFlag:
+		case Address:
+			printf("Invalid register provided to write_reg_8bit\n");
+			exit(1);
+	}
 }
 
-struct MemoryUpdate write_pc(struct State *state, unsigned short value) 
+struct MemoryUpdate write_reg_16bit(struct State* state, enum MemoryLocation reg, unsigned short value)
 {
-  unsigned short old_val = state->program_counter;
-  state->program_counter = value;
-	struct MemoryUpdate result;
-	result.location = ProgramCounter;
-	result.old_val_16bit = old_val;
-	result.new_val_16bit = value;
-	
-  return result;
+	switch (reg) {
+		case RegBC: return write_reg(RegBC, &state->reg_bc, value); 
+		case RegDE: return write_reg(RegDE, &state->reg_de, value); 
+		case RegHL: return write_reg(RegHL, &state->reg_hl, value); 
+		case StackPointer: return write_reg(StackPointer, &state->stack_pointer, value); 
+		case ProgramCounter: return write_reg(ProgramCounter, &state->program_counter, value); 
+
+		case RegA: 
+		case RegB: 
+		case RegC: 
+		case RegD:  
+		case RegE:  
+		case RegH:  
+		case RegL:  
+		case ZFlag:
+		case NFlag:
+		case HFlag:
+		case CFlag:
+		case Address:
+			printf("Invalid register provided to write_reg_16bit\n");
+			exit(1);
+	}
+
 }
 
 struct MemoryUpdate write_z_flag(struct State* state, bool value)
@@ -137,6 +141,75 @@ struct MemoryUpdate write_z_flag(struct State* state, bool value)
   return result;
 }
 
+struct MemoryUpdate write_n_flag(struct State* state, bool value)
+{
+	bool old_val = state->reg_af & 0b01000000;
+	//TODO: find better way?
+	state->reg_af &= 0b10111111;
+  state->reg_af |= ((unsigned short)value << 6);
+	struct MemoryUpdate result;
+	result.location = NFlag;
+	result.old_val_1bit = old_val;
+	result.new_val_1bit = value;
+	
+  return result;
+}
+
+struct MemoryUpdate write_h_flag(struct State* state, bool value)
+{
+	bool old_val = state->reg_af & 0b00100000;
+	//TODO: find better way?
+	state->reg_af &= 0b11011111;
+  state->reg_af |= ((unsigned short)value << 5);
+	struct MemoryUpdate result;
+	result.location = HFlag;
+	result.old_val_1bit = old_val;
+	result.new_val_1bit = value;
+	
+  return result;
+}
+
+struct MemoryUpdate write_c_flag(struct State* state, bool value)
+{
+	bool old_val = state->reg_af & 0b00010000;
+	//TODO: find better way?
+	state->reg_af &= 0b11101111;
+  state->reg_af |= ((unsigned short)value << 4);
+	struct MemoryUpdate result;
+	result.location = CFlag;
+	result.old_val_1bit = old_val;
+	result.new_val_1bit = value;
+	
+  return result;
+}
+
+struct MemoryUpdate write_flag(struct State* state, enum MemoryLocation flag, bool value)
+{
+	switch (flag) {
+		case ZFlag: return write_z_flag(state, value);
+		case NFlag: return write_n_flag(state, value);
+		case HFlag: return write_h_flag(state, value);
+		case CFlag: return write_c_flag(state, value);
+
+		case RegBC: 
+		case RegDE: 
+		case RegHL: 
+		case StackPointer: 
+		case ProgramCounter: 
+		case RegA: 
+		case RegB: 
+		case RegC: 
+		case RegD:  
+		case RegE:  
+		case RegH:  
+		case RegL:  
+		case Address:
+			printf("Invalid flag provided to write_flag\n");
+			exit(1);
+	}
+}
+
+
 struct MemoryUpdate write_addr(struct State* state, unsigned short addr, unsigned char value)
 {
 	unsigned char old_val = state->memory[addr];
@@ -151,35 +224,93 @@ struct MemoryUpdate write_addr(struct State* state, unsigned short addr, unsigne
 
 }
 
+struct MemoryUpdate increase_pc(struct State* state, unsigned short amount) { return write_reg_16bit(state, ProgramCounter, read_reg_16bit(state, ProgramCounter) + amount); }
+
 // Read functions
 
-unsigned char read_reg_a(struct State* state)
+unsigned char read_reg_8bit(struct State* state, enum MemoryLocation reg)
 {
-	return state->reg_af >> 8;
+	switch (reg) {
+		case RegA: return state->reg_af >> 8; 
+		case RegB: return state->reg_bc >> 8; 
+		case RegC: return state->reg_bc; 
+		case RegD: return state->reg_de >> 8; 
+		case RegE: return state->reg_de; 
+		case RegH: return state->reg_hl >> 8; 
+		case RegL: return state->reg_hl; 
+
+		case RegBC:
+		case RegDE:
+		case RegHL:
+		case StackPointer:
+		case ProgramCounter:
+		case ZFlag:
+		case NFlag:
+		case HFlag:
+		case CFlag:
+		case Address:
+			printf("Invalid register provided to read_reg_8bit\n");
+			exit(1);
+		}
 }
 
-unsigned char read_reg_h(struct State* state)
+unsigned short read_reg_16bit(struct State* state, enum MemoryLocation reg)
 {
-	return state->reg_hl >> 8;
+	switch (reg) {
+		case RegBC: return state->reg_bc; 
+		case RegDE: return state->reg_de;
+		case RegHL: return state->reg_hl;
+		case StackPointer: return state->stack_pointer;
+		case ProgramCounter: return state->program_counter;
+
+		case RegA: 
+		case RegB: 
+		case RegC: 
+		case RegD: 
+		case RegE: 
+		case RegH: 
+		case RegL: 
+		case ZFlag:
+		case NFlag:
+		case HFlag:
+		case CFlag:
+		case Address:
+			printf("Invalid register provided to read_reg_16bit\n");
+			exit(1);
+		}
+}
+
+bool read_z_flag(struct State* state) { return (state->reg_af & 0b10000000) != 0; }
+bool read_n_flag(struct State* state) { return (state->reg_af & 0b01000000) != 0; }
+bool read_h_flag(struct State* state) { return (state->reg_af & 0b00100000) != 0; }
+bool read_c_flag(struct State* state) { return (state->reg_af & 0b00010000) != 0; }
+
+bool read_flag(struct State* state, enum MemoryLocation flag)
+{
+	switch (flag) {
+		case ZFlag: return read_z_flag(state);
+		case NFlag: return read_n_flag(state);
+		case HFlag: return read_h_flag(state);
+		case CFlag: return read_c_flag(state);
+
+		case RegBC: 
+		case RegDE: 
+		case RegHL: 
+		case StackPointer: 
+		case ProgramCounter: 
+		case RegA: 
+		case RegB: 
+		case RegC: 
+		case RegD:  
+		case RegE:  
+		case RegH:  
+		case RegL:  
+		case Address:
+			printf("Invalid flag provided to write_flag\n");
+			exit(1);
+	}
 }
 
 
-unsigned short read_reg_hl(struct State* state)
-{
-	return state->reg_hl;
-}
+unsigned char read_addr(struct State* state, unsigned short addr) { return state->memory[addr]; }
 
-unsigned short read_sp(struct State* state)
-{
-	return state->stack_pointer;
-}
-
-unsigned short read_pc(struct State* state)
-{
-	return state->program_counter;
-}
-
-bool read_z_flag(struct State* state) 
-{
-	return state->reg_af >> 7;
-}
