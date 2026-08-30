@@ -127,20 +127,6 @@ struct MemoryUpdate write_reg_16bit(struct State* state, enum MemoryLocation reg
 
 }
 
-struct MemoryUpdate write_z_flag(struct State* state, bool value)
-{
-	bool old_val = state->reg_af & 0b10000000;
-	//TODO: find better way?
-	state->reg_af &= 0b01111111;
-  state->reg_af |= ((unsigned short)value << 7);
-	struct MemoryUpdate result;
-	result.location = ZFlag;
-	result.old_val_1bit = old_val;
-	result.new_val_1bit = value;
-	
-  return result;
-}
-
 struct MemoryUpdate write_n_flag(struct State* state, bool value)
 {
 	bool old_val = state->reg_af & 0b01000000;
@@ -185,11 +171,12 @@ struct MemoryUpdate write_c_flag(struct State* state, bool value)
 
 struct MemoryUpdate write_flag(struct State* state, enum MemoryLocation flag, bool value)
 {
+	unsigned char bit_pos;
 	switch (flag) {
-		case ZFlag: return write_z_flag(state, value);
-		case NFlag: return write_n_flag(state, value);
-		case HFlag: return write_h_flag(state, value);
-		case CFlag: return write_c_flag(state, value);
+		case ZFlag: bit_pos = 7; break;
+		case NFlag: bit_pos = 6; break;
+		case HFlag: bit_pos = 5; break;
+		case CFlag: bit_pos = 4; break;
 
 		case RegBC: 
 		case RegDE: 
@@ -207,6 +194,20 @@ struct MemoryUpdate write_flag(struct State* state, enum MemoryLocation flag, bo
 			printf("Invalid flag provided to write_flag\n");
 			exit(1);
 	}
+	bool old_val = state->reg_af & (1u << bit_pos);
+
+	if (value) {
+		state->reg_af |= (1u << bit_pos);
+	} else {
+		state->reg_af &= ~(1u << bit_pos);
+	}
+
+	struct MemoryUpdate result;
+	result.location = flag;
+	result.old_val_1bit = old_val;
+	result.new_val_1bit = value;
+	
+  return result;
 }
 
 
