@@ -104,7 +104,7 @@ struct InstructionResult op_ld_a_ff00_plus_u8(struct State* state)
 	struct InstructionResult result;
 	result.num_memory_updates = 2;
 	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
-	result.updates[0] = write_reg_8bit(state, RegA, read_addr(state, 0xFF00 + read_reg_16bit(state, ProgramCounter) + 1));
+	result.updates[0] = write_reg_8bit(state, RegA, read_addr(state, 0xFF00 + read_addr(state, read_reg_16bit(state, ProgramCounter) + 1)));
 	result.updates[1] = increase_pc(state, 2);
 
 	return result;

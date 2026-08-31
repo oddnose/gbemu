@@ -13,6 +13,8 @@ set(SOURCE_FILES
 	src/op/rotate_instructions.c
 	src/op/branch_instructions.c
 	src/state.c
+	src/cpu.c
+	src/ppu.c
 	src/main.c
 )
 
