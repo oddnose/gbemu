@@ -12,6 +12,7 @@ struct InstructionResult op_bit_7_h(struct State* state)
 	bool val = read_reg_8bit(state, RegH) >> 7;
 	result.updates[0] = write_flag(state, ZFlag, !val);
 	result.updates[1] = increase_pc(state, 2);
+	result.cycles = 8;
 
 	// TODO: sets flag H and resets N
 	return result;
@@ -32,6 +33,7 @@ struct InstructionResult op_rl_c(struct State* state)
 	result.updates[3] = write_flag(state, HFlag, 0);
 	result.updates[4] = write_flag(state, CFlag, (new_val & 0b10000000) >> 7);
 	result.updates[5] = increase_pc(state, 2);
+	result.cycles = 8;
 
 	return result;
 }
@@ -51,6 +53,7 @@ struct InstructionResult op_rla(struct State* state)
 	result.updates[3] = write_flag(state, HFlag, 0);
 	result.updates[4] = write_flag(state, CFlag, (new_val & 0b10000000) >> 7);
 	result.updates[5] = increase_pc(state, 1);
+	result.cycles = 8;
 
 	return result;
 }

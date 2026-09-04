@@ -28,5 +28,23 @@ struct InstructionResult op_dec_h(struct State* state);
 struct InstructionResult op_dec_l(struct State* state);
 struct InstructionResult op_dec_hl_addr(struct State* state);
 
+struct InstructionResult op_sub_a_a(struct State* state);
+struct InstructionResult op_sub_a_b(struct State* state);
+struct InstructionResult op_sub_a_c(struct State* state);
+struct InstructionResult op_sub_a_d(struct State* state);
+struct InstructionResult op_sub_a_e(struct State* state);
+struct InstructionResult op_sub_a_h(struct State* state);
+struct InstructionResult op_sub_a_l(struct State* state);
+struct InstructionResult op_sub_a_hl_addr(struct State* state);
+
+struct InstructionResult op_cp_a_a(struct State* state);
+struct InstructionResult op_cp_a_b(struct State* state);
+struct InstructionResult op_cp_a_c(struct State* state);
+struct InstructionResult op_cp_a_d(struct State* state);
+struct InstructionResult op_cp_a_e(struct State* state);
+struct InstructionResult op_cp_a_h(struct State* state);
+struct InstructionResult op_cp_a_l(struct State* state);
+struct InstructionResult op_cp_a_hl_addr(struct State* state);
+
 struct InstructionResult op_cp_a_uint8(struct State* state);
 

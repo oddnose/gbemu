@@ -30,10 +30,8 @@ struct Ppu* create_ppu()
 void ppu_tick(struct Ppu* ppu, struct State* state)
 {
 	ppu->cycle_count++;
-	//printf("ppu cycle count: %d\n", ppu->cycle_count);
 	switch (ppu->ppu_state) {
 		case OAMSearch: {
-			//printf("OAMSearch\n");
 
 			if (ppu->cycle_count == 20) {
 				ppu->ppu_state = PixelTransfer;
@@ -41,7 +39,6 @@ void ppu_tick(struct Ppu* ppu, struct State* state)
 			break;
 		}
 		case PixelTransfer: {
-			//printf("PixelTransfer\n");
 
 			if (ppu->cycle_count == 63) { //TODO: could vary
 				ppu->ppu_state = HBlank;
@@ -49,13 +46,12 @@ void ppu_tick(struct Ppu* ppu, struct State* state)
 			break;
 		}
 		case HBlank: {
-			//printf("HBlank\n");
 
 			if (ppu->cycle_count == 114) { //line end
 				ppu->cycle_count = 0;
 				unsigned char ly = read_addr(state, 0xFF44);
 				write_addr(state, 0xFF44, ly + 1);
-				printf("Update LY: %d\n", ly + 1);
+				//printf("Update LY: %d\n", ly + 1);
 
 				if (ly + 1 == 144) {
 					ppu->ppu_state = VBlank;
@@ -66,19 +62,18 @@ void ppu_tick(struct Ppu* ppu, struct State* state)
 			break;
 		}
 		case VBlank: {
-			//printf("VBlank\n");
 			if (ppu->cycle_count == 114) { //line end
 				ppu->cycle_count = 0;
 				unsigned char ly = read_addr(state, 0xFF44);
 
 				if (ly == 153) {
 					write_addr(state, 0xFF44, 0);
-					printf("Update LY: %d\n", 0);
+					//printf("Update LY: %d\n", 0);
 
 					ppu->ppu_state = OAMSearch;
 				} else {
 					write_addr(state, 0xFF44, ly + 1);
-					printf("Update LY: %d\n", ly + 1);
+					//printf("Update LY: %d\n", ly + 1);
 
 				}
 			}

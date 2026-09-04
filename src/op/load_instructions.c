@@ -1,7 +1,6 @@
 #include "load_instructions.h"
 #include "op/instruction_result.h"
 #include "state.h"
-#include <stdio.h>
 #include <stdlib.h>
 
 
@@ -12,6 +11,7 @@ struct InstructionResult load_u16_to_reg(struct State* state, enum MemoryLocatio
 	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_reg_16bit(state, reg, read_short(state, read_reg_16bit(state, ProgramCounter) + 1));
 	result.updates[1] = increase_pc(state, 3);
+	result.cycles = 12;
 
 	return result;
 }
@@ -27,6 +27,7 @@ struct InstructionResult load_u8_to_reg(struct State* state, enum MemoryLocation
 	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_reg_8bit(state, reg, read_short(state, read_reg_16bit(state, ProgramCounter) + 1));
 	result.updates[1] = increase_pc(state, 2);
+	result.cycles = 8;
 
 	return result;
 }
@@ -47,6 +48,7 @@ struct InstructionResult op_ld_hld_a(struct State* state)
 	result.updates[0] = write_addr(state, read_reg_16bit(state, RegHL), read_reg_8bit(state, RegA));
 	result.updates[1] = write_reg_16bit(state, RegHL, read_reg_16bit(state, RegHL) - 1);
 	result.updates[2] = increase_pc(state, 1);
+	result.cycles = 8;
 
 	return result;
 }
@@ -59,6 +61,7 @@ struct InstructionResult op_ld_hli_a(struct State* state)
 	result.updates[0] = write_addr(state, read_reg_16bit(state, RegHL), read_reg_8bit(state, RegA));
 	result.updates[1] = write_reg_16bit(state, RegHL, read_reg_16bit(state, RegHL) + 1);
 	result.updates[2] = increase_pc(state, 1);
+	result.cycles = 8;
 
 	return result;
 
@@ -72,6 +75,7 @@ struct InstructionResult op_ld_ff00_plus_c_a(struct State* state)
 	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_addr(state, 0xFF00 + read_reg_8bit(state, RegC), read_reg_8bit(state, RegA));
 	result.updates[1] = increase_pc(state, 1);
+	result.cycles = 8;
 
 	return result;
 }
@@ -84,6 +88,7 @@ struct InstructionResult op_ld_hl_a(struct State* state)
 	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_addr(state, read_reg_16bit(state, RegHL), read_reg_8bit(state, RegA));
 	result.updates[1] = increase_pc(state, 1);
+	result.cycles = 8;
 
 	return result;
 }
@@ -95,6 +100,7 @@ struct InstructionResult op_ld_ff00_plus_u8_a(struct State* state)
 	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_addr(state, 0xFF00 + read_addr(state, read_reg_16bit(state, ProgramCounter) + 1), read_reg_8bit(state, RegA));
 	result.updates[1] = increase_pc(state, 2);
+	result.cycles = 12;
 
 	return result;
 }
@@ -106,6 +112,7 @@ struct InstructionResult op_ld_a_ff00_plus_u8(struct State* state)
 	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_reg_8bit(state, RegA, read_addr(state, 0xFF00 + read_addr(state, read_reg_16bit(state, ProgramCounter) + 1)));
 	result.updates[1] = increase_pc(state, 2);
+	result.cycles = 12;
 
 	return result;
 }
@@ -117,6 +124,7 @@ struct InstructionResult load_reg_to_reg(struct State* state, enum MemoryLocatio
 	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_reg_8bit(state, dest, read_reg_8bit(state, src));
 	result.updates[1] = increase_pc(state, 1);
+	result.cycles = 4;
 	return result;
 }
 
@@ -177,6 +185,7 @@ struct InstructionResult op_ld_a_de(struct State* state)
 	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_reg_8bit(state, RegA, read_addr(state, read_reg_16bit(state, RegDE)));
 	result.updates[1] = increase_pc(state, 1);
+	result.cycles = 8;
 	return result;
 }
 
@@ -187,6 +196,7 @@ struct InstructionResult op_ld_u16_a(struct State* state)
 	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_addr(state, read_short(state, read_reg_16bit(state, ProgramCounter) + 1), read_reg_8bit(state, RegA));
 	result.updates[1] = increase_pc(state, 3);
+	result.cycles = 16;
 	return result;
 }
 

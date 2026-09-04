@@ -6,7 +6,8 @@
 
 struct OpDefinition {
 	char* format_name;
-	uint8_t length;
+	unsigned char length;
 	struct InstructionResult(*callback)(struct State*);
+	unsigned char cycles;
 };
 
