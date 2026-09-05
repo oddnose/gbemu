@@ -11,3 +11,4 @@ Work in progress for a gameboy emulator
 * [OP code table](https://izik1.github.io/gbops/index.html)
 * [Gameboy CPU manual](http://www.codeslinger.co.uk/pages/projects/gameboy/files/GB.pdf)
 * [Roberto Vaccari's blog](https://robertovaccari.com/blog/2020_09_26_gameboy/)
+* [Lazy Stripes blog. The PPU explanations were especially helpful](https://blog.tigris.fr/2019/09/15/writing-an-emulator-the-first-pixel/)

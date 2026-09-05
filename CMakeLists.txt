@@ -15,6 +15,7 @@ set(SOURCE_FILES
 	src/state.c
 	src/cpu.c
 	src/ppu.c
+	src/display.c
 	src/main.c
 )
 
