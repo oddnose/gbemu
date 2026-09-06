@@ -12,6 +12,8 @@ enum PpuState {
 };
 
 struct Ppu {
+	struct Display* display;
+	
 	enum PpuState ppu_state;
 
 	//TODO: To be able to support double speed mode dots should be counted instead of cycles
@@ -23,6 +25,8 @@ struct Ppu {
 struct Ppu* create_ppu()
 {
 	struct Ppu* ppu = malloc(sizeof *ppu);
+
+	ppu->display = create_display();
 
 	ppu->ppu_state = OAMSearch;
 	ppu->cycle_count = 0;
@@ -67,7 +71,7 @@ void ppu_tick(struct Ppu* ppu, struct State* state)
 					// See pandocs 4.1
 					unsigned char pixel = ((high_byte >> bit) & 1) << 1 | ((low_byte >> bit) & 1);
 
-					write_pixel(pixel);
+					write_pixel(ppu->display, pixel);
 				}
 
 				tile_index++;
@@ -90,7 +94,7 @@ void ppu_tick(struct Ppu* ppu, struct State* state)
 				} else {
 					ppu->ppu_state = OAMSearch;
 				}
-				write_h_blank();
+				write_h_blank(ppu->display);
 			}
 			break;
 		}
@@ -104,7 +108,7 @@ void ppu_tick(struct Ppu* ppu, struct State* state)
 					//printf("Update LY: %d\n", 0);
 
 					ppu->ppu_state = OAMSearch;
-					write_v_blank();
+					write_v_blank(ppu->display);
 				} else {
 					write_addr(state, 0xFF44, ly + 1);
 					//printf("Update LY: %d\n", ly + 1);

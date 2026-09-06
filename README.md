@@ -2,6 +2,13 @@
 
 Work in progress for a gameboy emulator
 
+
+## Dependencies
+
+Uses SDL2 for graphics. Need to install:
+
+sudo apt install libsdl2-dev
+
 ## Resources
 
 * [Gameboy bootstrap ROM](https://gbdev.gg8.se/wiki/articles/Gameboy_Bootstrap_ROM)
@@ -12,3 +19,4 @@ Work in progress for a gameboy emulator
 * [Gameboy CPU manual](http://www.codeslinger.co.uk/pages/projects/gameboy/files/GB.pdf)
 * [Roberto Vaccari's blog](https://robertovaccari.com/blog/2020_09_26_gameboy/)
 * [Lazy Stripes blog. The PPU explanations were especially helpful](https://blog.tigris.fr/2019/09/15/writing-an-emulator-the-first-pixel/)
+* [The Ultimate Game Boy Talk (33c3)](https://www.youtube.com/watch?v=HyzD8pNlpwI)

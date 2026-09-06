@@ -5,6 +5,8 @@ project(gbemu C)
 set(C_STANDARD 23)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+find_package(SDL2 REQUIRED)
+
 set(SOURCE_FILES 
 	src/op/op_lookup.c
 	src/op/load_instructions.c
@@ -22,4 +24,5 @@ set(SOURCE_FILES
 include_directories(src)
 
 add_executable(gbemu ${SOURCE_FILES})
+target_link_libraries(gbemu ${SDL2_LIBRARIES})
 
