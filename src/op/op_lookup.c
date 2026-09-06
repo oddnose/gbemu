@@ -25,7 +25,7 @@ struct InstructionResult op_not_implemented(struct State* state)
 
 // Initialize lookup table with function pointers
 struct OpDefinition op_lookup[256] = {
-	[0x00] = { "NOP", 1, op_invalid },
+	[0x00] = { "NOP", 1, op_nop },
 	[0x01] = { "LD BC, $%04x", 3, op_not_implemented },
 	[0x02] = { "LD (BC), A", 1, op_not_implemented },
 	[0x03] = { "INC BC", 1, op_inc_bc },
@@ -43,7 +43,7 @@ struct OpDefinition op_lookup[256] = {
 	[0x0f] = { "RRCA", 1, op_not_implemented },
 	[0x10] = { "STOP", 1, op_not_implemented },
 	[0x11] = { "LD DE, $%04x", 3, op_ld_de_u16 },
-	[0x12] = { "LD (DE), A", 1, op_not_implemented },
+	[0x12] = { "LD (DE), A", 1, op_ld_de_addr_a },
 	[0x13] = { "INC DE", 1, op_inc_de },
 	[0x14] = { "INC D", 1, op_inc_d },
 	[0x15] = { "DEC D", 1, op_dec_d },
@@ -67,7 +67,7 @@ struct OpDefinition op_lookup[256] = {
 	[0x27] = { "DAA", 1, op_not_implemented },
 	[0x28] = { "JR Z, $%02x", 2, op_jr_z_i8 },
 	[0x29] = { "ADD HL, HL", 1, op_not_implemented },
-	[0x2a] = { "LD A, (HL+)", 1, op_not_implemented },
+	[0x2a] = { "LD A, (HL+)", 1, op_ld_a_hl_addr_inc },
 	[0x2b] = { "DEC HL", 1, op_not_implemented },
 	[0x2c] = { "INC L", 1, op_inc_l },
 	[0x2d] = { "DEC L", 1, op_dec_l },
@@ -220,7 +220,7 @@ struct OpDefinition op_lookup[256] = {
 	[0xc0] = { "RET NZ", 1, op_not_implemented },
 	[0xc1] = { "POP BC", 1, op_pop_bc },
 	[0xc2] = { "JP NZ, $%04x", 3, op_not_implemented },
-	[0xc3] = { "JP $%04x", 3, op_not_implemented },
+	[0xc3] = { "JP $%04x", 3, op_jp_u16 },
 	[0xc4] = { "CALL NZ, $%04x", 3, op_not_implemented },
 	[0xc5] = { "PUSH BC", 1, op_push_bc },
 	[0xc6] = { "ADD A, $%02x", 2, op_not_implemented },

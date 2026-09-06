@@ -22,7 +22,15 @@ const unsigned int rom_memory_end = 0x3FFF;
 void load_rom(struct State* state, char* rom_path)
 {
 	FILE *ptr = fopen(rom_path, "rb");
-	fread(state->memory, rom_memory_end, 1, ptr);
+	if (ptr == NULL) {
+		perror("Error opening file");
+		return;
+	}
+	fseek(ptr, 0, SEEK_END);
+	size_t size = ftell(ptr);
+	fseek(ptr, 0, SEEK_SET);
+	fread(state->memory, sizeof(unsigned char), size, ptr);
+	fclose(ptr);
 }
 
 unsigned char read_char(struct State* state, unsigned short source_memory_location)

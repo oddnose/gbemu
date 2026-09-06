@@ -86,3 +86,8 @@ struct InstructionResult op_ld_hli_a(struct State* state);
 
 struct InstructionResult op_ld_u16_a(struct State* state);
 
+struct InstructionResult op_ld_a_hl_addr_inc(struct State* state);
+
+struct InstructionResult op_ld_de_addr_a(struct State* state);
+
+

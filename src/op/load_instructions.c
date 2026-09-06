@@ -200,3 +200,25 @@ struct InstructionResult op_ld_u16_a(struct State* state)
 	return result;
 }
 
+struct InstructionResult op_ld_a_hl_addr_inc(struct State* state)
+{
+	struct InstructionResult result;
+	result.num_memory_updates = 3;
+	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
+	result.updates[0] = write_reg_8bit(state, RegA, read_addr(state, read_reg_16bit(state, RegHL)));
+	result.updates[1] = write_reg_16bit(state, RegHL, read_reg_16bit(state, RegHL) + 1);
+	result.updates[2] = increase_pc(state, 1);
+	result.cycles = 8;
+	return result;
+}
+
+struct InstructionResult op_ld_de_addr_a(struct State* state)
+{
+	struct InstructionResult result;
+	result.num_memory_updates = 2;
+	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
+	result.updates[0] = write_addr(state, read_reg_16bit(state, RegDE), read_reg_8bit(state, RegA));
+	result.updates[1] = increase_pc(state, 1);
+	result.cycles = 8;
+	return result;
+}

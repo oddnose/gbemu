@@ -1,6 +1,7 @@
 #include "cpu.h"
 #include "ppu.h"
 #include "state.h"
+#include <stdio.h>
 
 struct State* state;
 struct Cpu* cpu;

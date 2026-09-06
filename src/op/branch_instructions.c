@@ -4,6 +4,17 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+struct InstructionResult op_nop(struct State* state)
+{
+	struct InstructionResult result;
+	result.num_memory_updates = 1;
+	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
+	result.updates[0] = increase_pc(state, 1);
+	result.cycles = 1;
+
+	return result;
+}
+
 struct InstructionResult op_jr_i8(struct State* state)
 {
 	struct InstructionResult result;
@@ -106,6 +117,17 @@ struct InstructionResult op_ret(struct State* state)
 	result.updates[0] = write_reg_16bit(state, StackPointer, read_reg_16bit(state, StackPointer) + 2);
 	result.updates[1] = write_reg_16bit(state, ProgramCounter, new_pc);
 	result.cycles = 16;
+
+	return result;
+}
+
+struct InstructionResult op_jp_u16(struct State* state)
+{
+	struct InstructionResult result;
+	result.num_memory_updates = 1;
+	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
+	result.updates[0] = write_reg_16bit(state, ProgramCounter, read_short(state, read_reg_16bit(state, ProgramCounter) + 1));
+	result.cycles = 12;
 
 	return result;
 }
