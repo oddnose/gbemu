@@ -216,3 +216,39 @@ struct InstructionResult op_cp_a_e(struct State* state) { return cp_a_reg(state,
 struct InstructionResult op_cp_a_h(struct State* state) { return cp_a_reg(state, RegH); }
 struct InstructionResult op_cp_a_l(struct State* state) { return cp_a_reg(state, RegL); }
 struct InstructionResult op_cp_a_hl_addr(struct State* state) { return cp_a_reg(state, RegHL); }
+
+struct InstructionResult add_a_reg(struct State* state, enum MemoryLocation reg)
+{
+	struct InstructionResult result;
+	result.num_memory_updates = 4;
+	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
+
+	unsigned char new_val;
+	if (reg == RegHL) {
+		new_val = read_reg_8bit(state, RegA) + read_addr(state, read_reg_16bit(state, RegHL));
+		result.cycles = 8;
+	} else {
+		new_val = read_reg_8bit(state, RegA) + read_reg_8bit(state, reg);
+		result.cycles = 4;
+	}
+
+	result.updates[0] = write_reg_8bit(state, RegA, new_val);
+	result.updates[1] = write_flag(state, ZFlag, (new_val == 0));
+	result.updates[2] = write_flag(state, NFlag, 0);
+	//TODO: set H if no borrow from bit 4
+	//TODO: set C if no borrow 
+	result.updates[3] = increase_pc(state, 1);
+
+	return result;
+}
+
+struct InstructionResult op_add_a_a(struct State* state) { return add_a_reg(state, RegA); }
+struct InstructionResult op_add_a_b(struct State* state) { return add_a_reg(state, RegB); }
+struct InstructionResult op_add_a_c(struct State* state) { return add_a_reg(state, RegC); }
+struct InstructionResult op_add_a_d(struct State* state) { return add_a_reg(state, RegD); }
+struct InstructionResult op_add_a_e(struct State* state) { return add_a_reg(state, RegE); }
+struct InstructionResult op_add_a_h(struct State* state) { return add_a_reg(state, RegH); }
+struct InstructionResult op_add_a_l(struct State* state) { return add_a_reg(state, RegL); }
+struct InstructionResult op_add_a_hl_addr(struct State* state) { return add_a_reg(state, RegHL); }
+
+

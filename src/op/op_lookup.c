@@ -25,7 +25,7 @@ struct InstructionResult op_not_implemented(struct State* state)
 
 // Initialize lookup table with function pointers
 struct OpDefinition op_lookup[256] = {
-	[0x00] = { "NOP", 1, op_not_implemented },
+	[0x00] = { "NOP", 1, op_invalid },
 	[0x01] = { "LD BC, $%04x", 3, op_not_implemented },
 	[0x02] = { "LD (BC), A", 1, op_not_implemented },
 	[0x03] = { "INC BC", 1, op_inc_bc },
@@ -153,14 +153,14 @@ struct OpDefinition op_lookup[256] = {
 	[0x7d] = { "LD A, L", 1, op_ld_a_l },
 	[0x7e] = { "LD A, (HL)", 1, op_not_implemented },
 	[0x7f] = { "LD A, A", 1, op_ld_a_a },
-	[0x80] = { "ADD A, B", 1, op_not_implemented },
-	[0x81] = { "ADD A, C", 1, op_not_implemented },
-	[0x82] = { "ADD A, D", 1, op_not_implemented },
-	[0x83] = { "ADD A, E", 1, op_not_implemented },
-	[0x84] = { "ADD A, H", 1, op_not_implemented },
-	[0x85] = { "ADD A, L", 1, op_not_implemented },
-	[0x86] = { "ADD A, (HL)", 1, op_not_implemented },
-	[0x87] = { "ADD A, A", 1, op_not_implemented },
+	[0x80] = { "ADD A, B", 1, op_add_a_b },
+	[0x81] = { "ADD A, C", 1, op_add_a_c },
+	[0x82] = { "ADD A, D", 1, op_add_a_d },
+	[0x83] = { "ADD A, E", 1, op_add_a_e },
+	[0x84] = { "ADD A, H", 1, op_add_a_h },
+	[0x85] = { "ADD A, L", 1, op_add_a_l },
+	[0x86] = { "ADD A, (HL)", 1, op_add_a_hl_addr },
+	[0x87] = { "ADD A, A", 1, op_add_a_a },
 	[0x88] = { "ADC A, B", 1, op_not_implemented },
 	[0x89] = { "ADC A, C", 1, op_not_implemented },
 	[0x8a] = { "ADC A, D", 1, op_not_implemented },
@@ -283,7 +283,7 @@ struct OpDefinition op_lookup[256] = {
 	[0xff] = { "RST 38h", 1, op_not_implemented },
 };
 
-struct OpDefinition decode(struct State* state, unsigned char pos)
+struct OpDefinition decode(struct State* state, unsigned short pos)
 {
 	if (read_char(state, pos) == 0xcb) {
 		return cb_decode(state, pos + 1);

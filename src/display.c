@@ -62,9 +62,9 @@ void write_h_blank(struct Display* display)
 
 void write_v_blank(struct Display* display)
 {
-	SDL_UpdateTexture(display->texture, NULL, display->frame_buffer, col_count * sizeof(uint32_t));
-	SDL_RenderCopy(display->renderer, display->texture, NULL, NULL);
-	SDL_RenderPresent(display->renderer);
+	//SDL_UpdateTexture(display->texture, NULL, display->frame_buffer, col_count * sizeof(uint32_t));
+	//SDL_RenderCopy(display->renderer, display->texture, NULL, NULL);
+	//SDL_RenderPresent(display->renderer);
 
 	display->x = 0;
 	display->y = 0;

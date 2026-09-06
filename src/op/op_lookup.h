@@ -3,4 +3,4 @@
 #include "op_definition.h"
 #include <stdint.h>
 
-struct OpDefinition decode(struct State* state, unsigned char pos);
+struct OpDefinition decode(struct State* state, unsigned short pos);
