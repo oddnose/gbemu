@@ -21,8 +21,7 @@ struct State* create_state()
 const unsigned int rom_memory_end = 0x3FFF;
 void load_rom(struct State* state, char* rom_path)
 {
-	FILE *ptr;
-	ptr = fopen(rom_path, "rb");
+	FILE *ptr = fopen(rom_path, "rb");
 	fread(state->memory, rom_memory_end, 1, ptr);
 }
 

@@ -12,6 +12,7 @@ int main()
 	cpu = create_cpu();
 	ppu = create_ppu();
 
+	load_rom(state, "res/01-special.gb");
 	load_rom(state, "res/dmg.bin");
 
 	while (true) {

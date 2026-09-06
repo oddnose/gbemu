@@ -82,15 +82,15 @@ void cpu_tick(struct Cpu* cpu, struct State* state)
 		def = decode(state, read_reg_16bit(state, ProgramCounter));
 		//print_instruction(state, def, read_reg_16bit(state, ProgramCounter));
 		if (!def.callback) {
-			printf("Instruction not implemented!");
+			//printf("Instruction not implemented!");
 		}
 		struct InstructionResult result = def.callback(state);
 		//print_memory_updates(result.updates, result.num_memory_updates);
 		free(result.updates);
 		//printf("\n");
-		if (read_reg_16bit(state, ProgramCounter) == 0x00E9) {
+		/*if (read_reg_16bit(state, ProgramCounter) == 0x00E9) {
 			exit(0);
-		}
+		}*/
 
 		cpu->cycles_to_next_instruction = result.cycles; 
 	} else {

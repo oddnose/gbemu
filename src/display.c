@@ -1,6 +1,7 @@
 #include "display.h"
 #include <SDL_events.h>
 #include <SDL_hints.h>
+#include <SDL_pixels.h>
 #include <SDL_render.h>
 #include <stdlib.h>
 #include "SDL.h"
@@ -17,7 +18,9 @@ struct Display {
 	unsigned short x;
 	unsigned short y;
 
-	Uint8 palette[4][3];
+	uint32_t frame_buffer[160 * 144];
+
+	uint32_t palette[4];
 };
 
 struct Display* create_display()
@@ -32,29 +35,22 @@ struct Display* create_display()
 
 	SDL_RenderSetLogicalSize(display->renderer, col_count, row_count);
 
-	SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
-	SDL_RenderClear(display->renderer);
+	display->texture = SDL_CreateTexture(display->renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, col_count, row_count);
 
-	unsigned char palette[4][3] = {
-			{255, 255, 255}, // color 0
-			{192, 192, 192}, // color 1
-			{96,  96,  96 }, // color 2
-			{0,   0,   0  }  // color 3
-	};
-	memcpy(display->palette, palette, sizeof palette);
+	display->palette[0] = 0xFFFFFFFF; // white 
+	display->palette[1] = 0xFFC0C0C0; // light gray 
+	display->palette[2] = 0xFF606060; // dark gray 
+	display->palette[3] = 0xFF000000; // black
+
+	display->x = 0;
+	display->y = 0;
 
 	return display;
 }
 
 void write_pixel(struct Display* display, unsigned char color_index)
 {
-	Uint8 r = display->palette[color_index][0];
-	Uint8 g = display->palette[color_index][1];
-	Uint8 b = display->palette[color_index][2];
-
-	SDL_SetRenderDrawColor(display->renderer, r, g, b, 255);
-	SDL_RenderDrawPoint(display->renderer, display->x, display->y);
-
+	display->frame_buffer[display->y * col_count + display->x] = display->palette[color_index];
 	display->x++;
 }
 
@@ -66,6 +62,8 @@ void write_h_blank(struct Display* display)
 
 void write_v_blank(struct Display* display)
 {
+	SDL_UpdateTexture(display->texture, NULL, display->frame_buffer, col_count * sizeof(uint32_t));
+	SDL_RenderCopy(display->renderer, display->texture, NULL, NULL);
 	SDL_RenderPresent(display->renderer);
 
 	display->x = 0;
