@@ -18,6 +18,28 @@ struct State* create_state()
 	return state;
 }
 
+void set_gb_doctor_start(struct State* state) 
+{
+	state->reg_af = 0x01B0;
+	state->reg_bc = 0x0013;
+	state->reg_de = 0x00D8;
+	state->reg_hl = 0x014D;
+	state->stack_pointer = 0xFFFE;
+	state->program_counter = 0x0100;
+}
+
+void print_gb_doctor_debug(struct State* state)
+{
+	FILE* ptr = fopen("doctor-output.txt", "a");
+	fprintf(ptr, "A:%02x F:%02X B:%02X C:%02X D:%02X E:%02X H:%02X L:%02X SP:%04X PC:%04X PCMEM:%02X,%02X,%02X,%02X\n",
+				 state->reg_af >> 8, state->reg_af & 0x00FF, state->reg_bc >> 8, state->reg_bc & 0x00FF, state->reg_de >> 8, state->reg_de & 0x00FF, state->reg_hl >> 8, state->reg_hl & 0x00FF,
+				 state->stack_pointer, state->program_counter, 
+				 state->memory[state->program_counter], state->memory[state->program_counter + 1], state->memory[state->program_counter + 2], state->memory[state->program_counter + 3]
+				 );
+
+	fclose(ptr);
+}
+
 const unsigned int rom_memory_end = 0x3FFF;
 void load_rom(struct State* state, char* rom_path)
 {
@@ -92,6 +114,7 @@ struct MemoryUpdate write_reg_8bit(struct State* state, enum MemoryLocation reg,
 		case RegH: return write_upper_byte(RegH, &state->reg_hl, value); 
 		case RegL: return write_lower_byte(RegL, &state->reg_hl, value); 
 
+		case RegAF:
 		case RegBC:
 		case RegDE:
 		case RegHL:
@@ -110,6 +133,7 @@ struct MemoryUpdate write_reg_8bit(struct State* state, enum MemoryLocation reg,
 struct MemoryUpdate write_reg_16bit(struct State* state, enum MemoryLocation reg, unsigned short value)
 {
 	switch (reg) {
+		case RegAF: return write_reg(RegAF, &state->reg_af, value);
 		case RegBC: return write_reg(RegBC, &state->reg_bc, value); 
 		case RegDE: return write_reg(RegDE, &state->reg_de, value); 
 		case RegHL: return write_reg(RegHL, &state->reg_hl, value); 
@@ -185,6 +209,7 @@ struct MemoryUpdate write_flag(struct State* state, enum MemoryLocation flag, bo
 		case HFlag: bit_pos = 5; break;
 		case CFlag: bit_pos = 4; break;
 
+		case RegAF:
 		case RegBC: 
 		case RegDE: 
 		case RegHL: 
@@ -241,12 +266,13 @@ unsigned char read_reg_8bit(struct State* state, enum MemoryLocation reg)
 	switch (reg) {
 		case RegA: return state->reg_af >> 8; 
 		case RegB: return state->reg_bc >> 8; 
-		case RegC: return state->reg_bc; 
+		case RegC: return state->reg_bc & 0x00FF; 
 		case RegD: return state->reg_de >> 8; 
-		case RegE: return state->reg_de; 
+		case RegE: return state->reg_de & 0x00FF; 
 		case RegH: return state->reg_hl >> 8; 
-		case RegL: return state->reg_hl; 
+		case RegL: return state->reg_hl & 0x00FF; 
 
+		case RegAF:
 		case RegBC:
 		case RegDE:
 		case RegHL:
@@ -265,6 +291,7 @@ unsigned char read_reg_8bit(struct State* state, enum MemoryLocation reg)
 unsigned short read_reg_16bit(struct State* state, enum MemoryLocation reg)
 {
 	switch (reg) {
+		case RegAF: return state->reg_af;
 		case RegBC: return state->reg_bc; 
 		case RegDE: return state->reg_de;
 		case RegHL: return state->reg_hl;
@@ -301,6 +328,7 @@ bool read_flag(struct State* state, enum MemoryLocation flag)
 		case HFlag: return read_h_flag(state);
 		case CFlag: return read_c_flag(state);
 
+		case RegAF:
 		case RegBC: 
 		case RegDE: 
 		case RegHL: 
@@ -320,5 +348,13 @@ bool read_flag(struct State* state, enum MemoryLocation flag)
 }
 
 
-unsigned char read_addr(struct State* state, unsigned short addr) { return state->memory[addr]; }
+unsigned char read_addr(struct State* state, unsigned short addr)
+{ 
+	//TODO: Needed for gameboy-doctor
+	if (addr == 0xFF44) { 
+		printf("WARN: Returning hardcoded value for 0xFF44\n");
+		return 0x90; 
+	}
+	return state->memory[addr]; 
+}
 

@@ -16,6 +16,7 @@ struct InstructionResult load_u16_to_reg(struct State* state, enum MemoryLocatio
 	return result;
 }
 
+struct InstructionResult op_ld_bc_u16(struct State* state) { return load_u16_to_reg(state, RegBC); }
 struct InstructionResult op_ld_de_u16(struct State* state) { return load_u16_to_reg(state, RegDE); }
 struct InstructionResult op_ld_hl_u16(struct State* state) { return load_u16_to_reg(state, RegHL); }
 struct InstructionResult op_ld_sp_u16(struct State* state) { return load_u16_to_reg(state, StackPointer); }
@@ -122,9 +123,15 @@ struct InstructionResult load_reg_to_reg(struct State* state, enum MemoryLocatio
 	struct InstructionResult result;
 	result.num_memory_updates = 2;
 	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
-	result.updates[0] = write_reg_8bit(state, dest, read_reg_8bit(state, src));
+
+	if (src == RegHL) {
+		result.updates[0] = write_reg_8bit(state, dest, read_addr(state, read_reg_16bit(state, RegHL)));
+		result.cycles = 8;
+	} else {
+		result.updates[0] = write_reg_8bit(state, dest, read_reg_8bit(state, src));
+		result.cycles = 4;
+	}
 	result.updates[1] = increase_pc(state, 1);
-	result.cycles = 4;
 	return result;
 }
 
@@ -135,6 +142,7 @@ struct InstructionResult op_ld_a_d(struct State* state) { return load_reg_to_reg
 struct InstructionResult op_ld_a_e(struct State* state) { return load_reg_to_reg(state, RegA, RegE); }
 struct InstructionResult op_ld_a_h(struct State* state) { return load_reg_to_reg(state, RegA, RegH); }
 struct InstructionResult op_ld_a_l(struct State* state) { return load_reg_to_reg(state, RegA, RegL); }
+struct InstructionResult op_ld_a_hl_addr(struct State* state) { return load_reg_to_reg(state, RegA, RegHL); }
 struct InstructionResult op_ld_b_a(struct State* state) { return load_reg_to_reg(state, RegB, RegA); }
 struct InstructionResult op_ld_b_b(struct State* state) { return load_reg_to_reg(state, RegB, RegB); }
 struct InstructionResult op_ld_b_c(struct State* state) { return load_reg_to_reg(state, RegB, RegC); }
@@ -142,6 +150,7 @@ struct InstructionResult op_ld_b_d(struct State* state) { return load_reg_to_reg
 struct InstructionResult op_ld_b_e(struct State* state) { return load_reg_to_reg(state, RegB, RegE); }
 struct InstructionResult op_ld_b_h(struct State* state) { return load_reg_to_reg(state, RegB, RegH); }
 struct InstructionResult op_ld_b_l(struct State* state) { return load_reg_to_reg(state, RegB, RegL); }
+struct InstructionResult op_ld_b_hl_addr(struct State* state) { return load_reg_to_reg(state, RegB, RegHL); }
 struct InstructionResult op_ld_c_a(struct State* state) { return load_reg_to_reg(state, RegC, RegA); }
 struct InstructionResult op_ld_c_b(struct State* state) { return load_reg_to_reg(state, RegC, RegB); }
 struct InstructionResult op_ld_c_c(struct State* state) { return load_reg_to_reg(state, RegC, RegC); }
@@ -149,6 +158,7 @@ struct InstructionResult op_ld_c_d(struct State* state) { return load_reg_to_reg
 struct InstructionResult op_ld_c_e(struct State* state) { return load_reg_to_reg(state, RegC, RegE); }
 struct InstructionResult op_ld_c_h(struct State* state) { return load_reg_to_reg(state, RegC, RegH); }
 struct InstructionResult op_ld_c_l(struct State* state) { return load_reg_to_reg(state, RegC, RegL); }
+struct InstructionResult op_ld_c_hl_addr(struct State* state) { return load_reg_to_reg(state, RegC, RegHL); }
 struct InstructionResult op_ld_d_a(struct State* state) { return load_reg_to_reg(state, RegD, RegA); }
 struct InstructionResult op_ld_d_b(struct State* state) { return load_reg_to_reg(state, RegD, RegB); }
 struct InstructionResult op_ld_d_c(struct State* state) { return load_reg_to_reg(state, RegD, RegC); }
@@ -156,6 +166,7 @@ struct InstructionResult op_ld_d_d(struct State* state) { return load_reg_to_reg
 struct InstructionResult op_ld_d_e(struct State* state) { return load_reg_to_reg(state, RegD, RegE); }
 struct InstructionResult op_ld_d_h(struct State* state) { return load_reg_to_reg(state, RegD, RegH); }
 struct InstructionResult op_ld_d_l(struct State* state) { return load_reg_to_reg(state, RegD, RegL); }
+struct InstructionResult op_ld_d_hl_addr(struct State* state) { return load_reg_to_reg(state, RegD, RegHL); }
 struct InstructionResult op_ld_e_a(struct State* state) { return load_reg_to_reg(state, RegE, RegA); }
 struct InstructionResult op_ld_e_b(struct State* state) { return load_reg_to_reg(state, RegE, RegB); }
 struct InstructionResult op_ld_e_c(struct State* state) { return load_reg_to_reg(state, RegE, RegC); }
@@ -163,6 +174,7 @@ struct InstructionResult op_ld_e_d(struct State* state) { return load_reg_to_reg
 struct InstructionResult op_ld_e_e(struct State* state) { return load_reg_to_reg(state, RegE, RegE); }
 struct InstructionResult op_ld_e_h(struct State* state) { return load_reg_to_reg(state, RegE, RegH); }
 struct InstructionResult op_ld_e_l(struct State* state) { return load_reg_to_reg(state, RegE, RegL); }
+struct InstructionResult op_ld_e_hl_addr(struct State* state) { return load_reg_to_reg(state, RegE, RegHL); }
 struct InstructionResult op_ld_h_a(struct State* state) { return load_reg_to_reg(state, RegH, RegA); }
 struct InstructionResult op_ld_h_b(struct State* state) { return load_reg_to_reg(state, RegH, RegB); }
 struct InstructionResult op_ld_h_c(struct State* state) { return load_reg_to_reg(state, RegH, RegC); }
@@ -170,6 +182,7 @@ struct InstructionResult op_ld_h_d(struct State* state) { return load_reg_to_reg
 struct InstructionResult op_ld_h_e(struct State* state) { return load_reg_to_reg(state, RegH, RegE); }
 struct InstructionResult op_ld_h_h(struct State* state) { return load_reg_to_reg(state, RegH, RegH); }
 struct InstructionResult op_ld_h_l(struct State* state) { return load_reg_to_reg(state, RegH, RegL); }
+struct InstructionResult op_ld_h_hl_addr(struct State* state) { return load_reg_to_reg(state, RegH, RegHL); }
 struct InstructionResult op_ld_l_a(struct State* state) { return load_reg_to_reg(state, RegL, RegA); }
 struct InstructionResult op_ld_l_b(struct State* state) { return load_reg_to_reg(state, RegL, RegB); }
 struct InstructionResult op_ld_l_c(struct State* state) { return load_reg_to_reg(state, RegL, RegC); }
@@ -177,6 +190,7 @@ struct InstructionResult op_ld_l_d(struct State* state) { return load_reg_to_reg
 struct InstructionResult op_ld_l_e(struct State* state) { return load_reg_to_reg(state, RegL, RegE); }
 struct InstructionResult op_ld_l_h(struct State* state) { return load_reg_to_reg(state, RegL, RegH); }
 struct InstructionResult op_ld_l_l(struct State* state) { return load_reg_to_reg(state, RegL, RegL); }
+struct InstructionResult op_ld_l_hl_addr(struct State* state) { return load_reg_to_reg(state, RegL, RegHL); }
 
 struct InstructionResult op_ld_a_de(struct State* state)
 {
@@ -220,5 +234,74 @@ struct InstructionResult op_ld_de_addr_a(struct State* state)
 	result.updates[0] = write_addr(state, read_reg_16bit(state, RegDE), read_reg_8bit(state, RegA));
 	result.updates[1] = increase_pc(state, 1);
 	result.cycles = 8;
+	return result;
+}
+
+struct InstructionResult op_push(struct State* state, enum MemoryLocation reg)
+{
+	struct InstructionResult result;
+	result.num_memory_updates = 5;
+	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
+
+	unsigned short reg_value = read_reg_16bit(state, reg);
+
+	result.updates[0] = write_reg_16bit(state, StackPointer, read_reg_16bit(state, StackPointer) - 1);
+	result.updates[1] = write_addr(state, read_reg_16bit(state, StackPointer), reg_value & 0x00FF);
+	result.updates[2] = write_reg_16bit(state, StackPointer, read_reg_16bit(state, StackPointer) - 1);
+	result.updates[3] = write_addr(state, read_reg_16bit(state, StackPointer), reg_value >> 8);
+	result.updates[4] = increase_pc(state, 1);
+	result.cycles = 16;
+
+	return result;
+}
+
+struct InstructionResult op_push_af(struct State* state) { return op_push(state, RegAF); }
+struct InstructionResult op_push_bc(struct State* state) { return op_push(state, RegBC); }
+struct InstructionResult op_push_de(struct State* state) { return op_push(state, RegDE); }
+struct InstructionResult op_push_hl(struct State* state) { return op_push(state, RegHL); }
+
+struct InstructionResult op_pop(struct State* state, enum MemoryLocation reg)
+{
+	struct InstructionResult result;
+	result.num_memory_updates = 4;
+	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
+
+	unsigned short reg_value = 0;
+	reg_value |= (unsigned short) read_addr(state, read_reg_16bit(state, StackPointer)) << 8;
+	reg_value |= (unsigned short) read_addr(state, read_reg_16bit(state, StackPointer) + 1);
+
+	result.updates[0] = write_reg_16bit(state, reg, reg_value);
+	result.updates[1] = write_reg_16bit(state, StackPointer, read_reg_16bit(state, StackPointer) + 2);
+	result.updates[2] = increase_pc(state, 1);
+	result.cycles = 12;
+
+	return result;
+}
+
+struct InstructionResult op_pop_af(struct State* state) { return op_pop(state, RegAF); }
+struct InstructionResult op_pop_bc(struct State* state) { return op_pop(state, RegBC); }
+struct InstructionResult op_pop_de(struct State* state) { return op_pop(state, RegDE); }
+struct InstructionResult op_pop_hl(struct State* state) { return op_pop(state, RegHL); }
+
+
+struct InstructionResult op_ld_a_addr(struct State* state)
+{
+	struct InstructionResult result;
+	result.num_memory_updates = 2;
+	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
+	result.updates[0] = write_reg_8bit(state, RegA, read_addr(state, read_short(state, read_reg_16bit(state, ProgramCounter) + 1)));
+	result.updates[1] = increase_pc(state, 3);
+	result.cycles = 16;
+	return result;
+}
+
+struct InstructionResult op_ld_addr_sp(struct State* state)
+{
+	struct InstructionResult result;
+	result.num_memory_updates = 2;
+	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
+	result.updates[0] = write_addr(state, read_short(state, read_reg_16bit(state, ProgramCounter) + 1), read_reg_16bit(state, StackPointer));
+	result.updates[1] = increase_pc(state, 3);
+	result.cycles = 20;
 	return result;
 }

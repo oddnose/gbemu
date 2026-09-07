@@ -70,14 +70,14 @@ struct OpDefinition cb_lookup[256] = {
 	[0x35] = { "SWAP L", 2, cb_not_implemented },
 	[0x36] = { "SWAP (HL)", 2, cb_not_implemented },
 	[0x37] = { "SWAP A", 2, cb_not_implemented },
-	[0x38] = { "SRL B", 2, cb_not_implemented },
-	[0x39] = { "SRL C", 2, cb_not_implemented },
-	[0x3a] = { "SRL D", 2, cb_not_implemented },
-	[0x3b] = { "SRL E", 2, cb_not_implemented },
-	[0x3c] = { "SRL H", 2, cb_not_implemented },
-	[0x3d] = { "SRL L", 2, cb_not_implemented },
-	[0x3e] = { "SRL (HL)", 2, cb_not_implemented },
-	[0x3f] = { "SRL A", 2, cb_not_implemented },
+	[0x38] = { "SRL B", 2, op_srl_b },
+	[0x39] = { "SRL C", 2, op_srl_c },
+	[0x3a] = { "SRL D", 2, op_srl_d },
+	[0x3b] = { "SRL E", 2, op_srl_e },
+	[0x3c] = { "SRL H", 2, op_srl_h },
+	[0x3d] = { "SRL L", 2, op_srl_l },
+	[0x3e] = { "SRL (HL)", 2, op_srl_hl_addr },
+	[0x3f] = { "SRL A", 2, op_srl_a },
 	[0x40] = { "BIT 0, B", 2, cb_not_implemented },
 	[0x41] = { "BIT 0, C", 2, cb_not_implemented },
 	[0x42] = { "BIT 0, D", 2, cb_not_implemented },
@@ -272,7 +272,8 @@ struct OpDefinition cb_lookup[256] = {
 	[0xff] = { "SET 7, A", 2, cb_not_implemented }
 };
 
-struct OpDefinition cb_decode(struct State* state, unsigned char pos)
+struct OpDefinition cb_decode(struct State* state, unsigned short pos)
 {
+	printf("asdf %04x\n", pos);
 	return cb_lookup[read_char(state, pos)];
 }

@@ -28,32 +28,56 @@ struct InstructionResult op_jr_i8(struct State* state)
 
 struct InstructionResult op_jr_nz_i8(struct State* state)
 {
+	if (!read_flag(state, ZFlag)) {
+		return op_jr_i8(state);
+	} 
 	struct InstructionResult result;
 	result.num_memory_updates = 1;
 	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
-	if (!read_flag(state, ZFlag)) {
-		result.updates[0] = write_reg_16bit(state, ProgramCounter, read_reg_16bit(state, ProgramCounter) + (char) read_char(state, read_reg_16bit(state, ProgramCounter) + 1) + 2); // 2 = length of instruction
-		result.cycles = 12;
-	} else {
-		result.updates[0] = increase_pc(state, 2);
-		result.cycles = 8;
-	}
+	result.updates[0] = increase_pc(state, 2);
+	result.cycles = 8;
 
 	return result;
 }
 
 struct InstructionResult op_jr_z_i8(struct State* state)
 {
+	if (read_flag(state, ZFlag)) {
+		return op_jr_i8(state);
+	} 
 	struct InstructionResult result;
 	result.num_memory_updates = 1;
 	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
-	if (read_flag(state, ZFlag)) {
-		result.updates[0] = write_reg_16bit(state, ProgramCounter, read_reg_16bit(state, ProgramCounter) + (char) read_char(state, read_reg_16bit(state, ProgramCounter) + 1) + 2); // 2 = length of instruction
-		result.cycles = 12;
-	} else {
-		result.updates[0] = increase_pc(state, 2);
-		result.cycles = 8;
-	}
+	result.updates[0] = increase_pc(state, 2);
+	result.cycles = 8;
+
+	return result;
+}
+
+struct InstructionResult op_jr_nc_i8(struct State* state)
+{
+	if (!read_flag(state, CFlag)) {
+		return op_jr_i8(state);
+	} 
+	struct InstructionResult result;
+	result.num_memory_updates = 1;
+	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
+	result.updates[0] = increase_pc(state, 2);
+	result.cycles = 8;
+
+	return result;
+}
+
+struct InstructionResult op_jr_c_i8(struct State* state)
+{
+	if (read_flag(state, CFlag)) {
+		return op_jr_i8(state);
+	} 
+	struct InstructionResult result;
+	result.num_memory_updates = 1;
+	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
+	result.updates[0] = increase_pc(state, 2);
+	result.cycles = 8;
 
 	return result;
 }
@@ -76,31 +100,15 @@ struct InstructionResult op_call_u16(struct State* state)
 	return result;
 }
 
-struct InstructionResult op_push_bc(struct State* state)
+struct InstructionResult op_call_nz_u16(struct State* state)
 {
+	if (read_flag(state, ZFlag) == 0) {
+		return op_call_u16(state);
+	}
 	struct InstructionResult result;
-	result.num_memory_updates = 5;
+	result.num_memory_updates = 1;
 	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
-	result.updates[0] = write_reg_16bit(state, StackPointer, read_reg_16bit(state, StackPointer) - 1);
-	result.updates[1] = write_addr(state, read_reg_16bit(state, StackPointer), read_reg_8bit(state, RegC));
-	result.updates[2] = write_reg_16bit(state, StackPointer, read_reg_16bit(state, StackPointer) - 1);
-	result.updates[3] = write_addr(state, read_reg_16bit(state, StackPointer), read_reg_8bit(state, RegB));
-	result.updates[4] = increase_pc(state, 1);
-	result.cycles = 16;
-
-	return result;
-}
-
-struct InstructionResult op_pop_bc(struct State* state)
-{
-	struct InstructionResult result;
-	result.num_memory_updates = 5;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
-	result.updates[0] = write_reg_8bit(state, RegB, read_addr(state, read_reg_16bit(state, StackPointer)));
-	result.updates[1] = write_reg_16bit(state, StackPointer, read_reg_16bit(state, StackPointer) + 1);
-	result.updates[2] = write_reg_8bit(state, RegC, read_addr(state, read_reg_16bit(state, StackPointer)));
-	result.updates[3] = write_reg_16bit(state, StackPointer, read_reg_16bit(state, StackPointer) + 1);
-	result.updates[4] = increase_pc(state, 1);
+	result.updates[0] = increase_pc(state, 3);
 	result.cycles = 12;
 
 	return result;
@@ -121,6 +129,60 @@ struct InstructionResult op_ret(struct State* state)
 	return result;
 }
 
+struct InstructionResult op_ret_nz(struct State* state)
+{
+	if (!read_flag(state, ZFlag)) {
+		return op_ret(state);
+	}
+	struct InstructionResult result;
+	result.num_memory_updates = 1;
+	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
+	result.updates[0] = increase_pc(state, 1);
+	result.cycles = 8;
+	return result;
+}
+
+struct InstructionResult op_ret_z(struct State* state) 
+{
+	if (read_flag(state, ZFlag)) {
+		return op_ret(state);
+	}
+	struct InstructionResult result;
+	result.num_memory_updates = 1;
+	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
+	result.updates[0] = increase_pc(state, 1);
+	result.cycles = 8;
+	return result;
+
+}
+
+struct InstructionResult op_ret_nc(struct State* state)
+{
+	if (!read_flag(state, CFlag)) {
+		return op_ret(state);
+	}
+	struct InstructionResult result;
+	result.num_memory_updates = 1;
+	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
+	result.updates[0] = increase_pc(state, 1);
+	result.cycles = 8;
+	return result;
+
+}
+
+struct InstructionResult op_ret_c(struct State* state)
+{
+	if (read_flag(state, CFlag)) {
+		return op_ret(state);
+	}
+	struct InstructionResult result;
+	result.num_memory_updates = 1;
+	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
+	result.updates[0] = increase_pc(state, 1);
+	result.cycles = 8;
+	return result;
+}
+
 struct InstructionResult op_jp_u16(struct State* state)
 {
 	struct InstructionResult result;
@@ -128,6 +190,18 @@ struct InstructionResult op_jp_u16(struct State* state)
 	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_reg_16bit(state, ProgramCounter, read_short(state, read_reg_16bit(state, ProgramCounter) + 1));
 	result.cycles = 12;
+
+	return result;
+}
+
+struct InstructionResult op_di(struct State* state)
+{
+	//TODO: Disables interrupts
+	struct InstructionResult result;
+	result.num_memory_updates = 1;
+	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
+	result.updates[0] = increase_pc(state, 1);
+	result.cycles = 4;
 
 	return result;
 }

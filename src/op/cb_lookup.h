@@ -2,4 +2,4 @@
 
 #include "op_definition.h"
 
-struct OpDefinition cb_decode(struct State* state, unsigned char pos);
+struct OpDefinition cb_decode(struct State* state, unsigned short pos);

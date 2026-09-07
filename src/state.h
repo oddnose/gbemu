@@ -12,6 +12,7 @@ enum MemoryLocation {
 	RegE,
 	RegH,
 	RegL,
+	RegAF,
 	RegBC,
 	RegDE,
 	RegHL,
@@ -43,6 +44,8 @@ struct MemoryUpdate {
 struct State* create_state();
 void load_rom(struct State* state, char* rom_path);
 
+void set_gb_doctor_start(struct State* state);
+void print_gb_doctor_debug(struct State* state);
 
 // Write functions
 struct MemoryUpdate write_reg_8bit(struct State* state, enum MemoryLocation reg, unsigned char value);

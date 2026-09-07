@@ -3,8 +3,6 @@
 #include "op/instruction_result.h"
 #include "state.h"
 
-struct InstructionResult op_xor_a_a(struct State* state);
-
 struct InstructionResult op_inc_a(struct State* state);
 struct InstructionResult op_inc_b(struct State* state);
 struct InstructionResult op_inc_c(struct State* state);
@@ -37,6 +35,8 @@ struct InstructionResult op_sub_a_h(struct State* state);
 struct InstructionResult op_sub_a_l(struct State* state);
 struct InstructionResult op_sub_a_hl_addr(struct State* state);
 
+struct InstructionResult op_sub_a_u8(struct State* state);
+
 struct InstructionResult op_cp_a_a(struct State* state);
 struct InstructionResult op_cp_a_b(struct State* state);
 struct InstructionResult op_cp_a_c(struct State* state);
@@ -56,3 +56,35 @@ struct InstructionResult op_add_a_e(struct State* state);
 struct InstructionResult op_add_a_h(struct State* state);
 struct InstructionResult op_add_a_l(struct State* state);
 struct InstructionResult op_add_a_hl_addr(struct State* state);
+struct InstructionResult op_add_a_u8(struct State* state);
+
+struct InstructionResult op_adc_a_a(struct State* state);
+struct InstructionResult op_adc_a_b(struct State* state);
+struct InstructionResult op_adc_a_c(struct State* state);
+struct InstructionResult op_adc_a_d(struct State* state);
+struct InstructionResult op_adc_a_e(struct State* state);
+struct InstructionResult op_adc_a_h(struct State* state);
+struct InstructionResult op_adc_a_l(struct State* state);
+struct InstructionResult op_adc_a_hl_addr(struct State* state);
+struct InstructionResult op_adc_a_u8(struct State* state);
+
+struct InstructionResult op_or_a_a(struct State* state);
+struct InstructionResult op_or_a_b(struct State* state);
+struct InstructionResult op_or_a_c(struct State* state);
+struct InstructionResult op_or_a_d(struct State* state);
+struct InstructionResult op_or_a_e(struct State* state);
+struct InstructionResult op_or_a_h(struct State* state);
+struct InstructionResult op_or_a_l(struct State* state);
+struct InstructionResult op_or_a_hl_addr(struct State* state);
+
+struct InstructionResult op_xor_a_a(struct State* state);
+struct InstructionResult op_xor_a_b(struct State* state);
+struct InstructionResult op_xor_a_c(struct State* state);
+struct InstructionResult op_xor_a_d(struct State* state);
+struct InstructionResult op_xor_a_e(struct State* state);
+struct InstructionResult op_xor_a_h(struct State* state);
+struct InstructionResult op_xor_a_l(struct State* state);
+struct InstructionResult op_xor_a_hl_addr(struct State* state);
+
+struct InstructionResult op_and_a_u8(struct State* state);
+

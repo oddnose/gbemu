@@ -92,6 +92,7 @@ void cpu_tick(struct Cpu* cpu, struct State* state)
 		/*if (read_reg_16bit(state, ProgramCounter) == 0x00E9) {
 			exit(0);
 		}*/
+		print_gb_doctor_debug(state);
 
 		cpu->cycles_to_next_instruction = result.cycles; 
 	} else {
