@@ -7,8 +7,6 @@
 struct InstructionResult load_u16_to_reg(struct State* state, enum MemoryLocation reg)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 2;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_reg_16bit(state, reg, read_short(state, read_reg_16bit(state, ProgramCounter) + 1));
 	result.updates[1] = increase_pc(state, 3);
 	result.cycles = 12;
@@ -24,8 +22,6 @@ struct InstructionResult op_ld_sp_u16(struct State* state) { return load_u16_to_
 struct InstructionResult load_u8_to_reg(struct State* state, enum MemoryLocation reg)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 2;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_reg_8bit(state, reg, read_short(state, read_reg_16bit(state, ProgramCounter) + 1));
 	result.updates[1] = increase_pc(state, 2);
 	result.cycles = 8;
@@ -44,8 +40,6 @@ struct InstructionResult op_ld_l_u8(struct State* state) { return load_u8_to_reg
 struct InstructionResult op_ld_hld_a(struct State* state)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 3;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_addr(state, read_reg_16bit(state, RegHL), read_reg_8bit(state, RegA));
 	result.updates[1] = write_reg_16bit(state, RegHL, read_reg_16bit(state, RegHL) - 1);
 	result.updates[2] = increase_pc(state, 1);
@@ -57,8 +51,6 @@ struct InstructionResult op_ld_hld_a(struct State* state)
 struct InstructionResult op_ld_hli_a(struct State* state)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 3;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_addr(state, read_reg_16bit(state, RegHL), read_reg_8bit(state, RegA));
 	result.updates[1] = write_reg_16bit(state, RegHL, read_reg_16bit(state, RegHL) + 1);
 	result.updates[2] = increase_pc(state, 1);
@@ -72,8 +64,6 @@ struct InstructionResult op_ld_hli_a(struct State* state)
 struct InstructionResult op_ld_ff00_plus_c_a(struct State* state) 
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 2;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_addr(state, 0xFF00 + read_reg_8bit(state, RegC), read_reg_8bit(state, RegA));
 	result.updates[1] = increase_pc(state, 1);
 	result.cycles = 8;
@@ -82,23 +72,10 @@ struct InstructionResult op_ld_ff00_plus_c_a(struct State* state)
 }
 
 
-struct InstructionResult op_ld_hl_a(struct State* state)
-{
-	struct InstructionResult result;
-	result.num_memory_updates = 2;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
-	result.updates[0] = write_addr(state, read_reg_16bit(state, RegHL), read_reg_8bit(state, RegA));
-	result.updates[1] = increase_pc(state, 1);
-	result.cycles = 8;
-
-	return result;
-}
 
 struct InstructionResult op_ld_ff00_plus_u8_a(struct State* state)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 2;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_addr(state, 0xFF00 + read_addr(state, read_reg_16bit(state, ProgramCounter) + 1), read_reg_8bit(state, RegA));
 	result.updates[1] = increase_pc(state, 2);
 	result.cycles = 12;
@@ -109,8 +86,6 @@ struct InstructionResult op_ld_ff00_plus_u8_a(struct State* state)
 struct InstructionResult op_ld_a_ff00_plus_u8(struct State* state)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 2;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_reg_8bit(state, RegA, read_addr(state, 0xFF00 + read_addr(state, read_reg_16bit(state, ProgramCounter) + 1)));
 	result.updates[1] = increase_pc(state, 2);
 	result.cycles = 12;
@@ -121,16 +96,22 @@ struct InstructionResult op_ld_a_ff00_plus_u8(struct State* state)
 struct InstructionResult load_reg_to_reg(struct State* state, enum MemoryLocation dest, enum MemoryLocation src)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 2;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
-
+	unsigned char src_val;
 	if (src == RegHL) {
-		result.updates[0] = write_reg_8bit(state, dest, read_addr(state, read_reg_16bit(state, RegHL)));
+		src_val = read_addr(state, read_reg_16bit(state, RegHL));
 		result.cycles = 8;
 	} else {
-		result.updates[0] = write_reg_8bit(state, dest, read_reg_8bit(state, src));
+		src_val = read_reg_8bit(state, src);
 		result.cycles = 4;
 	}
+
+	if (dest == RegHL) {
+		result.updates[0] = write_addr(state, read_reg_16bit(state, RegHL), src_val);
+		result.cycles = 8;
+	} else {
+		result.updates[0] = write_reg_8bit(state, dest, src_val);
+	}
+
 	result.updates[1] = increase_pc(state, 1);
 	return result;
 }
@@ -191,12 +172,17 @@ struct InstructionResult op_ld_l_e(struct State* state) { return load_reg_to_reg
 struct InstructionResult op_ld_l_h(struct State* state) { return load_reg_to_reg(state, RegL, RegH); }
 struct InstructionResult op_ld_l_l(struct State* state) { return load_reg_to_reg(state, RegL, RegL); }
 struct InstructionResult op_ld_l_hl_addr(struct State* state) { return load_reg_to_reg(state, RegL, RegHL); }
+struct InstructionResult op_ld_hl_addr_a(struct State* state) { return load_reg_to_reg(state, RegHL, RegA); }
+struct InstructionResult op_ld_hl_addr_b(struct State* state) { return load_reg_to_reg(state, RegHL, RegB); }
+struct InstructionResult op_ld_hl_addr_c(struct State* state) { return load_reg_to_reg(state, RegHL, RegC); }
+struct InstructionResult op_ld_hl_addr_d(struct State* state) { return load_reg_to_reg(state, RegHL, RegD); }
+struct InstructionResult op_ld_hl_addr_e(struct State* state) { return load_reg_to_reg(state, RegHL, RegE); }
+struct InstructionResult op_ld_hl_addr_h(struct State* state) { return load_reg_to_reg(state, RegHL, RegH); }
+struct InstructionResult op_ld_hl_addr_l(struct State* state) { return load_reg_to_reg(state, RegHL, RegL); }
 
 struct InstructionResult op_ld_a_de(struct State* state)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 2;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_reg_8bit(state, RegA, read_addr(state, read_reg_16bit(state, RegDE)));
 	result.updates[1] = increase_pc(state, 1);
 	result.cycles = 8;
@@ -206,8 +192,6 @@ struct InstructionResult op_ld_a_de(struct State* state)
 struct InstructionResult op_ld_u16_a(struct State* state)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 2;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_addr(state, read_short(state, read_reg_16bit(state, ProgramCounter) + 1), read_reg_8bit(state, RegA));
 	result.updates[1] = increase_pc(state, 3);
 	result.cycles = 16;
@@ -217,8 +201,6 @@ struct InstructionResult op_ld_u16_a(struct State* state)
 struct InstructionResult op_ld_a_hl_addr_inc(struct State* state)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 3;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_reg_8bit(state, RegA, read_addr(state, read_reg_16bit(state, RegHL)));
 	result.updates[1] = write_reg_16bit(state, RegHL, read_reg_16bit(state, RegHL) + 1);
 	result.updates[2] = increase_pc(state, 1);
@@ -229,8 +211,6 @@ struct InstructionResult op_ld_a_hl_addr_inc(struct State* state)
 struct InstructionResult op_ld_de_addr_a(struct State* state)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 2;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_addr(state, read_reg_16bit(state, RegDE), read_reg_8bit(state, RegA));
 	result.updates[1] = increase_pc(state, 1);
 	result.cycles = 8;
@@ -240,8 +220,6 @@ struct InstructionResult op_ld_de_addr_a(struct State* state)
 struct InstructionResult op_push(struct State* state, enum MemoryLocation reg)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 5;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 
 	unsigned short reg_value = read_reg_16bit(state, reg);
 
@@ -263,8 +241,6 @@ struct InstructionResult op_push_hl(struct State* state) { return op_push(state,
 struct InstructionResult op_pop(struct State* state, enum MemoryLocation reg)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 4;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 
 	unsigned short reg_value = 0;
 	reg_value |= (unsigned short) read_addr(state, read_reg_16bit(state, StackPointer)) << 8;
@@ -287,8 +263,6 @@ struct InstructionResult op_pop_hl(struct State* state) { return op_pop(state, R
 struct InstructionResult op_ld_a_addr(struct State* state)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 2;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_reg_8bit(state, RegA, read_addr(state, read_short(state, read_reg_16bit(state, ProgramCounter) + 1)));
 	result.updates[1] = increase_pc(state, 3);
 	result.cycles = 16;
@@ -298,8 +272,6 @@ struct InstructionResult op_ld_a_addr(struct State* state)
 struct InstructionResult op_ld_addr_sp(struct State* state)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 2;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	result.updates[0] = write_addr(state, read_short(state, read_reg_16bit(state, ProgramCounter) + 1), read_reg_16bit(state, StackPointer));
 	result.updates[1] = increase_pc(state, 3);
 	result.cycles = 20;

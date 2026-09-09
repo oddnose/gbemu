@@ -9,6 +9,11 @@ Uses SDL2 for graphics. Need to install:
 
 sudo apt install libsdl2-dev
 
+## Supports
+
+Blargg test ROMs:
+* 01-special
+
 ## Resources
 
 * [Gameboy bootstrap ROM](https://gbdev.gg8.se/wiki/articles/Gameboy_Bootstrap_ROM)

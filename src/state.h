@@ -5,6 +5,7 @@
 struct State;
 
 enum MemoryLocation {
+	None,
 	RegA,
 	RegB,
 	RegC,

@@ -38,14 +38,14 @@ struct OpDefinition cb_lookup[256] = {
 	[0x15] = { "RL L", 2, cb_not_implemented },
 	[0x16] = { "RL (HL)", 2, cb_not_implemented },
 	[0x17] = { "RL A", 2, cb_not_implemented },
-	[0x18] = { "RR B", 2, cb_not_implemented },
-	[0x19] = { "RR C", 2, cb_not_implemented },
-	[0x1a] = { "RR D", 2, cb_not_implemented },
-	[0x1b] = { "RR E", 2, cb_not_implemented },
-	[0x1c] = { "RR H", 2, cb_not_implemented },
-	[0x1d] = { "RR L", 2, cb_not_implemented },
-	[0x1e] = { "RR (HL)", 2, cb_not_implemented },
-	[0x1f] = { "RR A", 2, cb_not_implemented },
+	[0x18] = { "RR B", 2, op_rr_b },
+	[0x19] = { "RR C", 2, op_rr_c },
+	[0x1a] = { "RR D", 2, op_rr_d },
+	[0x1b] = { "RR E", 2, op_rr_e },
+	[0x1c] = { "RR H", 2, op_rr_h },
+	[0x1d] = { "RR L", 2, op_rr_l },
+	[0x1e] = { "RR (HL)", 2, op_rr_hl_addr },
+	[0x1f] = { "RR A", 2, op_rr_a },
 	[0x20] = { "SLA B", 2, cb_not_implemented },
 	[0x21] = { "SLA C", 2, cb_not_implemented },
 	[0x22] = { "SLA D", 2, cb_not_implemented },
@@ -274,6 +274,5 @@ struct OpDefinition cb_lookup[256] = {
 
 struct OpDefinition cb_decode(struct State* state, unsigned short pos)
 {
-	printf("asdf %04x\n", pos);
 	return cb_lookup[read_char(state, pos)];
 }

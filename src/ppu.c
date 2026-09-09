@@ -55,7 +55,7 @@ void ppu_tick(struct Ppu* ppu, struct State* state)
 
 			unsigned char x_pos = 0; //TODO: could be affected by shifting
 			unsigned char tile_line = ly % 8; // current line inside tile
-			unsigned short tile_index = ppu->cycle_count + (ly / 8) * 32; // the map contains 32 rows of tiles
+			unsigned short tile_index = ppu->map_start_addr + (ly / 8) * 32; // the map contains 32 rows of tiles
 
 			while (x_pos < 160) {
 				unsigned char tile_id = read_addr(state, tile_index);

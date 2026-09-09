@@ -21,6 +21,11 @@ struct InstructionResult op_ret_nc(struct State* state);
 struct InstructionResult op_ret_c(struct State* state);
 
 struct InstructionResult op_jp_u16(struct State* state);
+struct InstructionResult op_jp_nz_u16(struct State* state);
+struct InstructionResult op_jp_z_u16(struct State* state);
+struct InstructionResult op_jp_nc_u16(struct State* state);
+struct InstructionResult op_jp_c_u16(struct State* state);
+struct InstructionResult op_jp_hl(struct State* state);
 
 struct InstructionResult op_di(struct State* state);
 

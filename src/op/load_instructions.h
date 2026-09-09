@@ -5,7 +5,6 @@
 
 struct InstructionResult op_ld_hld_a(struct State* state);
 struct InstructionResult op_ld_ff00_plus_c_a(struct State* state);
-struct InstructionResult op_ld_hl_a(struct State* state);
 struct InstructionResult op_ld_ff00_plus_u8_a(struct State* state);
 struct InstructionResult op_ld_b_a(struct State* state);
 struct InstructionResult op_ld_a_de(struct State* state);
@@ -68,6 +67,13 @@ struct InstructionResult op_ld_l_e(struct State* state);
 struct InstructionResult op_ld_l_h(struct State* state);
 struct InstructionResult op_ld_l_l(struct State* state);
 struct InstructionResult op_ld_l_hl_addr(struct State* state);
+struct InstructionResult op_ld_hl_addr_a(struct State* state);
+struct InstructionResult op_ld_hl_addr_b(struct State* state);
+struct InstructionResult op_ld_hl_addr_c(struct State* state);
+struct InstructionResult op_ld_hl_addr_d(struct State* state);
+struct InstructionResult op_ld_hl_addr_e(struct State* state);
+struct InstructionResult op_ld_hl_addr_h(struct State* state);
+struct InstructionResult op_ld_hl_addr_l(struct State* state);
 
 // Load val to reg
 struct InstructionResult op_ld_a_u8(struct State* state);

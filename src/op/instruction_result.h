@@ -4,6 +4,5 @@
 
 struct InstructionResult {
 	unsigned char cycles;
-	unsigned char num_memory_updates;
-	struct MemoryUpdate* updates;
+	struct MemoryUpdate updates[6]; // No instruction has more than 6 updates
 };

@@ -7,7 +7,6 @@
 struct InstructionResult op_inc_reg(struct State* state, enum MemoryLocation reg)
 {
 	struct InstructionResult result;
-	unsigned char num_updates = 5;
 
 	unsigned char inc_result;
 	if (reg == RegHL) {
@@ -17,9 +16,6 @@ struct InstructionResult op_inc_reg(struct State* state, enum MemoryLocation reg
 		inc_result = read_reg_8bit(state, reg) + 1;
 		result.cycles = 4;
 	}
-
-	result.num_memory_updates = num_updates;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 
 	if (reg == RegHL) {
 		result.updates[0] = write_addr(state, read_reg_16bit(state, RegHL), inc_result); 
@@ -54,8 +50,6 @@ struct InstructionResult op_inc_reg_16bit(struct State* state, enum MemoryLocati
 	}
 
 	struct InstructionResult result;
-	result.num_memory_updates = num_updates;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 	unsigned char update_count = 0;
 	result.updates[update_count++] = write_reg_16bit(state, reg, inc_result); 
 
@@ -78,8 +72,6 @@ struct InstructionResult op_inc_sp(struct State* state) { return op_inc_reg_16bi
 struct InstructionResult dec_reg_8bit(struct State* state, enum MemoryLocation reg)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 5;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 
 	unsigned char new_val;
 	if (reg == RegHL) {
@@ -113,24 +105,24 @@ struct InstructionResult op_dec_hl_addr(struct State* state) { return dec_reg_8b
 struct InstructionResult sub_a_reg(struct State* state, enum MemoryLocation reg)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 4;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 
-	unsigned char new_val;
+	unsigned char a_val = read_reg_8bit(state, RegA);
+	unsigned char reg_val;
 	if (reg == RegHL) {
-		new_val = read_addr(state, read_reg_16bit(state, RegHL));
+		reg_val = read_addr(state, read_reg_16bit(state, RegHL));
 		result.cycles = 8;
 	} else {
-		new_val = read_reg_8bit(state, RegA) - read_addr(state, read_reg_8bit(state, reg));
+		reg_val = read_addr(state, read_reg_8bit(state, reg));
 		result.cycles = 4;
 	}
+	unsigned char new_val = a_val - reg_val;
 
 	result.updates[0] = write_reg_8bit(state, RegA, new_val);
 	result.updates[1] = write_flag(state, ZFlag, (new_val == 0));
 	result.updates[2] = write_flag(state, NFlag, 1);
-	//TODO: set H if no borrow from bit 4
-	//TODO: set C if no borrow 
-	result.updates[3] = increase_pc(state, 1);
+	result.updates[3] = write_flag(state, CFlag, a_val < reg_val);
+	result.updates[4] = write_flag(state, HFlag, (a_val & 0x0F) < (reg_val & 0x0F));
+	result.updates[5] = increase_pc(state, 1);
 
 	return result;
 
@@ -148,18 +140,18 @@ struct InstructionResult op_sub_a_hl_addr(struct State* state) { return sub_a_re
 struct InstructionResult op_sub_a_u8(struct State* state)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 4;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 
-	unsigned char new_val = read_addr(state, read_short(state, read_reg_16bit(state, ProgramCounter) + 1));
+	unsigned char a_val = read_reg_8bit(state, RegA);
+	unsigned char u8_val = read_addr(state, read_reg_16bit(state, ProgramCounter) + 1);
+	unsigned char new_val = a_val - u8_val;
 	result.cycles = 8;
 
 	result.updates[0] = write_reg_8bit(state, RegA, new_val);
 	result.updates[1] = write_flag(state, ZFlag, (new_val == 0));
 	result.updates[2] = write_flag(state, NFlag, 1);
-	//TODO: set H if no borrow from bit 4
-	//TODO: set C if no borrow 
-	result.updates[3] = increase_pc(state, 1);
+	result.updates[3] = write_flag(state, CFlag, a_val < u8_val);
+	result.updates[4] = write_flag(state, HFlag, (a_val & 0x0F) < (u8_val & 0x0F));
+	result.updates[5] = increase_pc(state, 2);
 
 	return result;
 }
@@ -167,16 +159,16 @@ struct InstructionResult op_sub_a_u8(struct State* state)
 struct InstructionResult op_cp_a_uint8(struct State* state)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 3;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 
-	unsigned char cp = read_reg_8bit(state, RegA) - read_addr(state, read_reg_16bit(state, ProgramCounter) + 1);
+	unsigned char a_val = read_reg_8bit(state, RegA);
+	unsigned char u8_val = read_addr(state, read_reg_16bit(state, ProgramCounter) + 1);
+	unsigned char cp = a_val - u8_val;
 
 	result.updates[0] = write_flag(state, ZFlag, (cp == 0));
 	result.updates[1] = write_flag(state, NFlag, 1);
-	//TODO: set H if no borrow from bit 4
-	//TODO: set C if no borrow 
-	result.updates[2] = increase_pc(state, 2);
+	result.updates[2] = write_flag(state, CFlag, a_val < u8_val);
+	result.updates[3] = write_flag(state, HFlag, (a_val & 0x0F) < (u8_val & 0x0F));
+	result.updates[4] = increase_pc(state, 2);
 	result.cycles = 8;
 
 	return result;
@@ -185,23 +177,23 @@ struct InstructionResult op_cp_a_uint8(struct State* state)
 struct InstructionResult cp_a_reg(struct State* state, enum MemoryLocation reg)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 3;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 
-	unsigned char cp;
+	unsigned char a_val = read_reg_8bit(state, RegA);
+	unsigned char reg_val;
 	if (reg == RegHL) {
-		cp = read_reg_8bit(state, RegA) - read_addr(state, read_reg_16bit(state, RegHL));
+		reg_val = read_addr(state, read_reg_16bit(state, RegHL));
 		result.cycles = 8;
 	} else {
-		cp = read_reg_8bit(state, RegA) - read_reg_8bit(state, read_reg_8bit(state, reg));
+		reg_val = read_reg_8bit(state, reg);
 		result.cycles = 4;
 	}
+	unsigned char cp = a_val - reg_val;
 
 	result.updates[0] = write_flag(state, ZFlag, (cp == 0));
 	result.updates[1] = write_flag(state, NFlag, 1);
-	//TODO: set H if no borrow from bit 4
-	//TODO: set C if no borrow 
-	result.updates[2] = increase_pc(state, 1);
+	result.updates[2] = write_flag(state, CFlag, a_val < reg_val);
+	result.updates[3] = write_flag(state, HFlag, (a_val & 0x0F) < (reg_val & 0x0F));
+	result.updates[4] = increase_pc(state, 1);
 
 	return result;
 }
@@ -218,24 +210,24 @@ struct InstructionResult op_cp_a_hl_addr(struct State* state) { return cp_a_reg(
 struct InstructionResult add_a_reg(struct State* state, enum MemoryLocation reg)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 4;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 
-	unsigned char new_val;
+	unsigned char a_val = read_reg_8bit(state, RegA);
+	unsigned char reg_val;
 	if (reg == RegHL) {
-		new_val = read_reg_8bit(state, RegA) + read_addr(state, read_reg_16bit(state, RegHL));
+		reg_val = read_addr(state, read_reg_16bit(state, RegHL));
 		result.cycles = 8;
 	} else {
-		new_val = read_reg_8bit(state, RegA) + read_reg_8bit(state, reg);
+		reg_val = read_reg_8bit(state, reg);
 		result.cycles = 4;
 	}
+	unsigned char new_val = a_val + reg_val;
 
 	result.updates[0] = write_reg_8bit(state, RegA, new_val);
 	result.updates[1] = write_flag(state, ZFlag, (new_val == 0));
 	result.updates[2] = write_flag(state, NFlag, 0);
-	//TODO: set H if no borrow from bit 4
-	//TODO: set C if no borrow 
-	result.updates[3] = increase_pc(state, 1);
+	result.updates[3] = write_flag(state, CFlag, ((unsigned short) a_val + reg_val) > 0xFF);
+	result.updates[4] = write_flag(state, HFlag, ((a_val & 0x0F) + (reg_val & 0x0F)) > 0x0F);
+	result.updates[5] = increase_pc(state, 1);
 
 	return result;
 }
@@ -252,44 +244,68 @@ struct InstructionResult op_add_a_hl_addr(struct State* state) { return add_a_re
 struct InstructionResult op_add_a_u8(struct State* state)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 4;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 
-	unsigned char new_val;
-	new_val = read_reg_8bit(state, RegA) + read_addr(state, read_reg_16bit(state, ProgramCounter) + 1);
+	unsigned char a_val = read_reg_8bit(state, RegA);
+	unsigned char u8_val = read_addr(state, read_reg_16bit(state, ProgramCounter) + 1);
+	unsigned char new_val = a_val + u8_val;
 	result.cycles = 8;
 
 	result.updates[0] = write_reg_8bit(state, RegA, new_val);
 	result.updates[1] = write_flag(state, ZFlag, (new_val == 0));
 	result.updates[2] = write_flag(state, NFlag, 0);
-	//TODO: set H if no borrow from bit 4
-	//TODO: set C if no borrow 
-	result.updates[3] = increase_pc(state, 1);
+	result.updates[3] = write_flag(state, CFlag, ((unsigned short) a_val + u8_val) > 0xFF);
+	result.updates[4] = write_flag(state, HFlag, ((a_val & 0x0F) + (u8_val & 0x0F)) > 0x0F);
+	result.updates[5] = increase_pc(state, 2);
 
 	return result;
 }
 
+struct InstructionResult add_hl_reg(struct State* state, enum MemoryLocation reg)
+{
+	struct InstructionResult result;
+
+	unsigned short hl_val = read_reg_16bit(state, RegHL);
+	unsigned short reg_val = read_reg_16bit(state, reg);
+	result.cycles = 8;
+	unsigned short new_val = hl_val + reg_val;
+
+	result.updates[0] = write_reg_16bit(state, RegHL, new_val);
+	result.updates[1] = write_flag(state, NFlag, 0);
+	result.updates[2] = write_flag(state, CFlag, ((unsigned long) hl_val + reg_val) > 0xFFFF);
+	result.updates[3] = write_flag(state, HFlag, ((hl_val & 0x0FFF) + (reg_val & 0x0FFF)) > 0x0FFF);
+	result.updates[4] = increase_pc(state, 1);
+
+	return result;
+}
+
+struct InstructionResult op_add_hl_bc(struct State* state) { return add_hl_reg(state, RegBC); }
+struct InstructionResult op_add_hl_de(struct State* state) { return add_hl_reg(state, RegDE); }
+struct InstructionResult op_add_hl_hl(struct State* state) { return add_hl_reg(state, RegHL); }
+struct InstructionResult op_add_hl_sp(struct State* state) { return add_hl_reg(state, StackPointer); }
+
 struct InstructionResult adc_a_reg(struct State* state, enum MemoryLocation reg)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 4;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 
-	unsigned char new_val;
+	unsigned char a_val = read_reg_8bit(state, RegA);
+	bool c_flag = read_flag(state, CFlag);
+	unsigned char reg_val;
 	if (reg == RegHL) {
-		new_val = read_reg_8bit(state, RegA) + read_addr(state, read_reg_16bit(state, RegHL)) + read_flag(state, CFlag);
+		reg_val = read_addr(state, read_reg_16bit(state, RegHL));
 		result.cycles = 8;
 	} else {
-		new_val = read_reg_8bit(state, RegA) + read_reg_8bit(state, reg) + read_flag(state, CFlag);
+		reg_val = read_reg_8bit(state, reg);
 		result.cycles = 4;
 	}
+
+	unsigned char new_val = a_val + reg_val + c_flag;
 
 	result.updates[0] = write_reg_8bit(state, RegA, new_val);
 	result.updates[1] = write_flag(state, ZFlag, (new_val == 0));
 	result.updates[2] = write_flag(state, NFlag, 0);
-	//TODO: set H if no borrow from bit 4
-	//TODO: set C if no borrow 
-	result.updates[3] = increase_pc(state, 1);
+	result.updates[3] = write_flag(state, CFlag, ((unsigned short) a_val + reg_val + c_flag) > 0xFF);
+	result.updates[4] = write_flag(state, HFlag, (c_flag + (a_val & 0x0F) + (reg_val & 0x0F)) > 0x0F);
+	result.updates[5] = increase_pc(state, 1);
 
 	return result;
 }
@@ -306,18 +322,19 @@ struct InstructionResult op_adc_a_hl_addr(struct State* state) { return adc_a_re
 struct InstructionResult op_adc_a_u8(struct State* state) 
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 4;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 
-	unsigned char new_val = read_reg_8bit(state, RegA) + read_short(state, read_reg_16bit(state, ProgramCounter) + 1) + read_flag(state, CFlag);
+	unsigned char a_val = read_reg_8bit(state, RegA);
+	unsigned char u8_val = read_addr(state, read_reg_16bit(state, ProgramCounter) + 1);
+	bool c_flag = read_flag(state, CFlag);
+	unsigned char new_val = a_val + u8_val + c_flag;
 	result.cycles = 8;
 
 	result.updates[0] = write_reg_8bit(state, RegA, new_val);
 	result.updates[1] = write_flag(state, ZFlag, (new_val == 0));
 	result.updates[2] = write_flag(state, NFlag, 0);
-	//TODO: set H if no borrow from bit 4
-	//TODO: set C if no borrow 
-	result.updates[3] = increase_pc(state, 1);
+	result.updates[3] = write_flag(state, CFlag, ((unsigned short) a_val + u8_val + c_flag) > 0xFF);
+	result.updates[4] = write_flag(state, HFlag, (c_flag + (a_val & 0x0F) + (u8_val & 0x0F)) > 0x0F);
+	result.updates[5] = increase_pc(state, 2);
 
 	return result;
 }
@@ -325,8 +342,6 @@ struct InstructionResult op_adc_a_u8(struct State* state)
 struct InstructionResult or_a_reg(struct State* state, enum MemoryLocation reg)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 6;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 
 	unsigned char new_val;
 	if (reg == RegHL) {
@@ -359,8 +374,6 @@ struct InstructionResult op_or_a_hl_addr(struct State* state) { return or_a_reg(
 struct InstructionResult xor_a_reg(struct State* state, enum MemoryLocation reg)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 6;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 
 	unsigned char new_val;
 	if (reg == RegHL) {
@@ -381,20 +394,37 @@ struct InstructionResult xor_a_reg(struct State* state, enum MemoryLocation reg)
 	return result;
 }
 
-struct InstructionResult op_xor_a_a(struct State* state) { return or_a_reg(state, RegA); }
-struct InstructionResult op_xor_a_b(struct State* state) { return or_a_reg(state, RegB); }
-struct InstructionResult op_xor_a_c(struct State* state) { return or_a_reg(state, RegC); }
-struct InstructionResult op_xor_a_d(struct State* state) { return or_a_reg(state, RegD); }
-struct InstructionResult op_xor_a_e(struct State* state) { return or_a_reg(state, RegE); }
-struct InstructionResult op_xor_a_h(struct State* state) { return or_a_reg(state, RegH); }
-struct InstructionResult op_xor_a_l(struct State* state) { return or_a_reg(state, RegL); }
-struct InstructionResult op_xor_a_hl_addr(struct State* state) { return or_a_reg(state, RegHL); }
+struct InstructionResult op_xor_a_a(struct State* state) { return xor_a_reg(state, RegA); }
+struct InstructionResult op_xor_a_b(struct State* state) { return xor_a_reg(state, RegB); }
+struct InstructionResult op_xor_a_c(struct State* state) { return xor_a_reg(state, RegC); }
+struct InstructionResult op_xor_a_d(struct State* state) { return xor_a_reg(state, RegD); }
+struct InstructionResult op_xor_a_e(struct State* state) { return xor_a_reg(state, RegE); }
+struct InstructionResult op_xor_a_h(struct State* state) { return xor_a_reg(state, RegH); }
+struct InstructionResult op_xor_a_l(struct State* state) { return xor_a_reg(state, RegL); }
+struct InstructionResult op_xor_a_hl_addr(struct State* state) { return xor_a_reg(state, RegHL); }
+
+struct InstructionResult op_xor_a_u8(struct State* state)
+{
+	struct InstructionResult result;
+
+	unsigned char new_val = read_reg_8bit(state, RegA) ^ read_addr(state, read_reg_16bit(state, ProgramCounter) + 1);
+	result.cycles = 8;
+
+	result.updates[0] = write_reg_8bit(state, RegA, new_val);
+	result.updates[1] = write_flag(state, ZFlag, (new_val == 0));
+	result.updates[2] = write_flag(state, NFlag, 0);
+	result.updates[3] = write_flag(state, HFlag, 0);
+	result.updates[4] = write_flag(state, CFlag, 0);
+	result.updates[5] = increase_pc(state, 2);
+
+	return result;
+
+
+}
 
 struct InstructionResult op_and_a_u8(struct State* state)
 {
 	struct InstructionResult result;
-	result.num_memory_updates = 6;
-	result.updates = malloc(result.num_memory_updates * sizeof *result.updates);
 
 	unsigned char new_val;
 	new_val = read_reg_8bit(state, RegA) & read_addr(state, read_reg_16bit(state, ProgramCounter) + 1);
@@ -408,6 +438,49 @@ struct InstructionResult op_and_a_u8(struct State* state)
 	result.updates[5] = increase_pc(state, 2);
 
 	return result;
+}
 
+// To understand this better, see: https://blog.ollien.com/posts/gb-daa/
+struct InstructionResult op_daa(struct State* state)
+{
+	struct InstructionResult result;
+
+	bool subtracting = read_flag(state, NFlag);
+	bool half_carry = read_flag(state, HFlag);
+	bool carry = read_flag(state, CFlag);
+	unsigned char a_val = read_reg_8bit(state, RegA);
+	unsigned char offset = 0;
+	unsigned char new_val = 0;
+
+	if (subtracting) {
+		if (half_carry) {
+			offset |= 0x06;
+		}
+		if (carry) {
+			offset |= 0x60;
+		}
+		new_val = a_val - offset;
+
+	} else {
+
+		if ((a_val & 0xF) > 0x09 || half_carry) {
+			offset |= 0x06;
+		}
+		if (a_val > 0x99 || carry) {
+			offset |= 0x60;
+			carry = true;
+		}
+		new_val = a_val + offset;
+	} 
+
+	result.cycles = 4;
+
+	result.updates[0] = write_reg_8bit(state, RegA, new_val);
+	result.updates[1] = write_flag(state, ZFlag, (new_val == 0));
+	result.updates[2] = write_flag(state, HFlag, 0);
+	result.updates[3] = write_flag(state, CFlag, carry);
+	result.updates[4] = increase_pc(state, 1);
+
+	return result;
 
 }

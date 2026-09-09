@@ -50,6 +50,11 @@ struct Display* create_display()
 
 void write_pixel(struct Display* display, unsigned char color_index)
 {
+	if (display->x >= col_count || display->y >= row_count) {
+		fprintf(stderr, "Pixel OOB: x=%u y=%u\n",
+						display->x, display->y);
+		abort();
+	}
 	display->frame_buffer[display->y * col_count + display->x] = display->palette[color_index];
 	display->x++;
 }

@@ -20,10 +20,9 @@ int main()
 	fprintf(ptr, "%s", "");
 	fclose(ptr);
 
-	set_gb_doctor_start(state);
-	print_gb_doctor_debug(state);
+	//set_gb_doctor_start(state);
+	//print_gb_doctor_debug(state);
 
-	//for (int i = 0; i < 100; i++) {
 	while (true) {
 		cpu_tick(cpu, state);
 		ppu_tick(ppu, state);

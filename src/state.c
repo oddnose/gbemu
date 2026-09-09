@@ -95,6 +95,11 @@ struct MemoryUpdate write_lower_byte(enum MemoryLocation location, unsigned shor
 struct MemoryUpdate write_reg(enum MemoryLocation location, unsigned short* reg, unsigned short value) {
   unsigned short old_val = *reg;
   *reg = value;
+
+	// The lower 4 bits of the flags register can never be set
+	if (location == RegAF) {
+		*reg &= 0xFFF0;
+	}
 	struct MemoryUpdate result;
 	result.location = location;
 	result.old_val_16bit = old_val;
@@ -350,11 +355,11 @@ bool read_flag(struct State* state, enum MemoryLocation flag)
 
 unsigned char read_addr(struct State* state, unsigned short addr)
 { 
-	//TODO: Needed for gameboy-doctor
-	if (addr == 0xFF44) { 
+	//: Needed for gameboy-doctor
+	/*if (addr == 0xFF44) { 
 		printf("WARN: Returning hardcoded value for 0xFF44\n");
 		return 0x90; 
-	}
+	}*/
 	return state->memory[addr]; 
 }
 

@@ -58,6 +58,11 @@ struct InstructionResult op_add_a_l(struct State* state);
 struct InstructionResult op_add_a_hl_addr(struct State* state);
 struct InstructionResult op_add_a_u8(struct State* state);
 
+struct InstructionResult op_add_hl_bc(struct State* state);
+struct InstructionResult op_add_hl_de(struct State* state);
+struct InstructionResult op_add_hl_hl(struct State* state);
+struct InstructionResult op_add_hl_sp(struct State* state);
+
 struct InstructionResult op_adc_a_a(struct State* state);
 struct InstructionResult op_adc_a_b(struct State* state);
 struct InstructionResult op_adc_a_c(struct State* state);
@@ -85,6 +90,9 @@ struct InstructionResult op_xor_a_e(struct State* state);
 struct InstructionResult op_xor_a_h(struct State* state);
 struct InstructionResult op_xor_a_l(struct State* state);
 struct InstructionResult op_xor_a_hl_addr(struct State* state);
+struct InstructionResult op_xor_a_u8(struct State* state);
 
 struct InstructionResult op_and_a_u8(struct State* state);
+
+struct InstructionResult op_daa(struct State* state);
 
